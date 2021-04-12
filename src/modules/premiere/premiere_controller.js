@@ -1,11 +1,11 @@
 const helper = require('../../helpers/wrapper')
-const movieModel = require('./movie_model')
+const premiereModel = require('./premiere_model')
 
 module.exports = {
   sayHello: (req, res) => {
-    res.status(200).send('Hello Movie')
+    res.status(200).send('Hello Premiere')
   },
-  getAllMovie: async (req, res) => {
+  getAllPremiere: async (req, res) => {
     try {
       // console.log(req.query)
       let { page, limit, sortBy, keywords, type } = req.query
@@ -13,7 +13,7 @@ module.exports = {
 
       page = parseInt(page)
       limit = parseInt(limit)
-      const totalData = await movieModel.getDataCount()
+      const totalData = await premiereModel.getDataCount()
       console.log('Total Data ' + totalData)
       const totalPage = Math.ceil(totalData / limit)
       console.log('Total Page ' + totalPage)
@@ -26,51 +26,45 @@ module.exports = {
       }
 
       if (sortBy === 'name') {
-        console.log(!keywords)
-        if (keywords) {
-          keywords = '%' + keywords + '%'
-          const result = await movieModel.getDataAllByNameSch(
-            limit,
-            offset,
-            keywords,
-            type
-          )
-          return helper.response(
-            res,
-            200,
-            `Succes Get Data By Name key = ${keywords}`,
-            result,
-            pageInfo
-          )
-        } else {
-          const result = await movieModel.getDataAllByName(limit, offset, type)
-          return helper.response(
-            res,
-            200,
-            `Succes Get Data By Name type = ${type}`,
-            result,
-            pageInfo
-          )
+        if (!keywords) {
+          return helper.response(res, 400, 'Keywords Undefined', null)
         }
-      } else if (sortBy === 'date') {
-        const result = await movieModel.getDataAllByDate(limit, offset, type)
+        keywords = '%' + keywords + '%'
+        const result = await premiereModel.getDataAllByName(
+          limit,
+          offset,
+          keywords,
+          type
+        )
         return helper.response(
           res,
           200,
-          'Succes Get Data By Date',
+          'Succes Get Data By Name',
           result,
           pageInfo
         )
+      } else if (sortBy === 'location') {
+        console.log('BY LOC')
+        const result = await premiereModel.getDataAllByLoc(limit, offset, type)
+        return helper.response(
+          res,
+          200,
+          'Succes Get Data By Location',
+          result,
+          pageInfo
+        )
+      } else {
+        return helper.response(res, 400, 'Sort By Undefined', null)
       }
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
-  getMovieById: async (req, res) => {
+  getPremiereById: async (req, res) => {
     try {
       // console.log(req.params)
       const { id } = req.params
-      const result = await movieModel.getDataById(id)
+      const result = await premiereModel.getDataById(id)
       // console.log(result) array ini
 
       if (result.length > 0) {
@@ -82,38 +76,34 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
-  postMovie: async (req, res) => {
+  postPremiere: async (req, res) => {
     try {
       // console.log(req.body)
-      const { movieName, movieCategory, movieReleaseDate } = req.body
+      const { premiereName, premiereLocation } = req.body
       const setData = {
-        movie_name: movieName,
-        movie_category: movieCategory,
-        movie_release_date: movieReleaseDate
+        premiere_name: premiereName,
+        location: premiereLocation
       }
       // console.log(setData)
-      const result = await movieModel.createData(setData)
+      const result = await premiereModel.createData(setData)
       return helper.response(res, 200, 'Succes Create Data', result)
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
-  updateMovie: async (req, res) => {
+  updatePremiere: async (req, res) => {
     try {
       const { id } = req.params
-      // kondisi pengecekan apakah data ada dalam database berdasarakan id
-      let result = await movieModel.getDataById(id)
+      let result = await premiereModel.getDataById(id)
 
       if (result.length > 0) {
-        const { movieName, movieCategory, movieReleaseDate } = req.body
+        const { premiereName, premiereLocation } = req.body
         const setData = {
-          movie_name: movieName,
-          movie_category: movieCategory,
-          movie_release_date: movieReleaseDate,
-          movie_updated_at: new Date(Date.now())
+          premiere_name: premiereName,
+          location: premiereLocation
         }
-        result = await movieModel.updateData(setData, id)
-        return helper.response(res, 200, 'Succes Update Movie', result)
+        result = await premiereModel.updateData(setData, id)
+        return helper.response(res, 200, 'Succes Update Premiere', result)
       } else {
         return helper.response(
           res,
@@ -126,18 +116,17 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
-  deletedMovie: async (req, res) => {
+  deletedPremiere: async (req, res) => {
     try {
-      // console.log(req.params)
       const { id } = req.params
-      let result = await movieModel.getDataById(id)
+      let result = await premiereModel.getDataById(id)
 
       if (result.length > 0) {
-        result = await movieModel.deleteData(id)
+        result = await premiereModel.deleteData(id)
         return helper.response(
           res,
           200,
-          `Succes Delete Movie With ID ${id}`,
+          `Succes Delete Premiere With ID ${id}`,
           result
         )
       } else {
