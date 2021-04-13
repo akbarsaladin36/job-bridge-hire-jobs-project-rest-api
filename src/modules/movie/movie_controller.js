@@ -8,10 +8,12 @@ module.exports = {
   getAllMovie: async (req, res) => {
     try {
       // console.log(req.query)
-      let { page, limit, sortBy, keywords, type } = req.query
-      type = type.toUpperCase()
+      let { page, limit, sort, keywords } = req.query
+      console.log(sort)
 
       page = parseInt(page)
+      page > 1 ? (page = 1) : (page = 1)
+
       limit = parseInt(limit)
       const totalData = await movieModel.getDataCount()
       console.log('Total Data ' + totalData)
@@ -24,44 +26,14 @@ module.exports = {
         limit,
         totalData
       }
-
-      if (sortBy === 'name') {
-        console.log(!keywords)
-        if (keywords) {
-          keywords = '%' + keywords + '%'
-          const result = await movieModel.getDataAllByNameSch(
-            limit,
-            offset,
-            keywords,
-            type
-          )
-          return helper.response(
-            res,
-            200,
-            `Succes Get Data By Name key = ${keywords}`,
-            result,
-            pageInfo
-          )
-        } else {
-          const result = await movieModel.getDataAllByName(limit, offset, type)
-          return helper.response(
-            res,
-            200,
-            `Succes Get Data By Name type = ${type}`,
-            result,
-            pageInfo
-          )
-        }
-      } else if (sortBy === 'date') {
-        const result = await movieModel.getDataAllByDate(limit, offset, type)
-        return helper.response(
-          res,
-          200,
-          'Succes Get Data By Date',
-          result,
-          pageInfo
-        )
-      }
+      const result = await movieModel.getDataAll(limit, offset, keywords, sort)
+      return helper.response(
+        res,
+        200,
+        'Succes Get Data By Name',
+        result,
+        pageInfo
+      )
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }

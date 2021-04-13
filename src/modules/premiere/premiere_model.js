@@ -1,39 +1,12 @@
 const connection = require('../../config/mysql')
 
 module.exports = {
-  getDataAllByName: (limit, offset, keywords, type) => {
+  getDataAll: () => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT * FROM premiere_location WHERE premiere_name LIKE ? ORDER BY premiere_name ' +
-          type +
-          ' LIMIT ? OFFSET ?',
-        [keywords, limit, offset],
+        'SELECT p.premiere_name, p.premiere_price, m.movie_name, m.movie_category, m.movie_release_date, l.location_city, l.location_addres FROM premiere p JOIN movie m ON p.movie_id = m.movie_id JOIN location l ON p.location_id = l.location_id',
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
-  getDataAllByLoc: (limit, offset, type) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT * FROM premiere_location ORDER BY location ' +
-          type +
-          ' LIMIT ? OFFSET ?',
-        [limit, offset],
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
-  getDataCount: () => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT COUNT(*) AS total FROM premiere_location',
-        (error, result) => {
-          // console.log(result) isi array dalamnya objek
-          !error ? resolve(result[0].total) : reject(new Error(error))
         }
       )
     })
@@ -41,7 +14,7 @@ module.exports = {
   getDataById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT * FROM premiere_location WHERE premiere_id = ?',
+        'SELECT * FROM premiere WHERE premiere_id = ?',
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
@@ -53,7 +26,7 @@ module.exports = {
   createData: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO premiere_location SET ?',
+        'INSERT INTO premiere SET ?',
         setData,
         (error, result) => {
           !error
@@ -66,7 +39,7 @@ module.exports = {
   updateData: (setData, id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE premiere_location SET ? WHERE premiere_id = ?',
+        'UPDATE premiere SET ? WHERE premiere_id = ?',
         [setData, id],
         (error, result) => {
           !error ? resolve({ id: id, ...setData }) : reject(new Error(error))
@@ -77,7 +50,7 @@ module.exports = {
   deleteData: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'DELETE FROM premiere_location WHERE premiere_id = ?',
+        'DELETE FROM premiere WHERE premiere_id = ?',
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))

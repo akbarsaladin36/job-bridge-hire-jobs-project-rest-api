@@ -5,9 +5,10 @@ const helmet = require('helmet')
 const compression = require('compression')
 const bodyParser = require('body-parser')
 const routerNavigation = require('./routes')
+require('dotenv').config()
 
 const app = express()
-const port = 3000
+const port = process.env.PORT
 
 app.use(morgan('dev'))
 app.use(cors())
@@ -19,12 +20,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use('/api/v1', routerNavigation)
 
-// app.post('/movie', (req, res) => {
-//   console.log('Post Movie Works !')
-//   console.log(req.body)
-//   // res.status(404).send('Hello World')
-// })
-
 app.listen(port, () => {
-  console.log(`Express-----www ${port}`)
+  console.log(`Express app now listen on ${port}`)
 })

@@ -1,23 +1,17 @@
 const connection = require('../../config/mysql')
 
 module.exports = {
-  getDataAllByMovieId: (id, limit, offset, type) => {
+  getDataAll: () => {
     return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT m.movie_id, p.premiere_name, p.location, s.date, s.price FROM movie m, premiere_location p, schedule s WHERE m.movie_id = ? and m.movie_id = s.movie_id and s.premiere_id = p.premiere_id ORDER BY s.price ' +
-          type +
-          ' LIMIT ? OFFSET ?',
-        [id, limit, offset],
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
+      connection.query('SELECT * FROM location', (error, result) => {
+        !error ? resolve(result) : reject(new Error(error))
+      })
     })
   },
   getDataById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT * FROM schedule WHERE schedule_id = ?',
+        'SELECT * FROM location WHERE location_id = ?',
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
@@ -25,21 +19,10 @@ module.exports = {
       )
     })
   },
-  getDataCount: () => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT COUNT(*) AS total FROM schedule',
-        (error, result) => {
-          // console.log(result) isi array dalamnya objek
-          !error ? resolve(result[0].total) : reject(new Error(error))
-        }
-      )
-    })
-  },
   createData: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'INSERT INTO schedule SET ?',
+        'INSERT INTO location SET ?',
         setData,
         (error, result) => {
           !error
@@ -52,7 +35,7 @@ module.exports = {
   updateData: (setData, id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'UPDATE schedule SET ? WHERE schedule_id = ?',
+        'UPDATE location SET ? WHERE location_id = ?',
         [setData, id],
         (error, result) => {
           !error ? resolve({ id: id, ...setData }) : reject(new Error(error))
@@ -63,7 +46,7 @@ module.exports = {
   deleteData: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'DELETE FROM schedule WHERE schedule_id = ?',
+        'DELETE FROM location WHERE location_id = ?',
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))

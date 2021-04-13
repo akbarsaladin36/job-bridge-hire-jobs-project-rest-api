@@ -1,37 +1,11 @@
 const connection = require('../../config/mysql')
 
 module.exports = {
-  getDataAllByNameSch: (limit, offset, keywords, type) => {
+  getDataAll: (limit, offset, keywords, sort) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT * FROM movie WHERE movie_name LIKE ? ORDER BY movie_name ' +
-          type +
-          ' LIMIT ? OFFSET ?',
+        `SELECT * FROM movie WHERE movie_name LIKE ? ORDER BY ${sort} LIMIT ? OFFSET ?`,
         [keywords, limit, offset],
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
-  getDataAllByName: (limit, offset, type) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT * FROM movie ORDER BY movie_name ' + type + ' LIMIT ? OFFSET ?',
-        [limit, offset],
-        (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
-        }
-      )
-    })
-  },
-  getDataAllByDate: (limit, offset, type) => {
-    return new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT * FROM movie ORDER BY movie_release_date ' +
-          type +
-          ' LIMIT ? OFFSET ?',
-        [limit, offset],
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
         }
