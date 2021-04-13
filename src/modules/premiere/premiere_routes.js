@@ -6,16 +6,16 @@ Route.get('/hello', premiereController.sayHello)
 Route.get('/location', premiereController.getAllLocation)
 Route.get('/location/:id', premiereController.getLocationById)
 
-Route.get('/', premiereController.getAllPremiere)
-Route.get('/:id', premiereController.getPremiereById)
+Route.get('/main', premiereController.getAllPremiere)
+Route.get('/main/:id', premiereController.getPremiereById)
 
 Route.post('/location', premiereController.postLocation)
-Route.post('/', premiereController.postPremiere)
+Route.post('/main', premiereController.postPremiere)
 
 Route.patch('/location/:id', premiereController.updateLocation)
-Route.patch('/:id', premiereController.updatePremiere)
+Route.patch('/main/:id', premiereController.updatePremiere)
 
 Route.delete('/location/:id', premiereController.deletedLocation)
-Route.delete('/:id', premiereController.deletedPremiere)
+Route.delete('/main/:id', premiereController.deletedPremiere)
 
 module.exports = Route

@@ -17,7 +17,6 @@ module.exports = {
   getAllLocation: async (req, res) => {
     try {
       const result = await locationModel.getDataAll()
-      console.log(result)
       return helper.response(res, 200, 'Succes Get Location Data', result)
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)

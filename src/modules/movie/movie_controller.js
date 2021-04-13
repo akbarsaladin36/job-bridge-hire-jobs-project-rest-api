@@ -11,8 +11,10 @@ module.exports = {
       let { page, limit, sort, keywords } = req.query
       console.log(sort)
 
+      keywords = keywords || '%'
+      sort = sort || 'movie_release_date ASC'
+
       page = parseInt(page)
-      page > 1 ? (page = 1) : (page = 1)
 
       limit = parseInt(limit)
       const totalData = await movieModel.getDataCount()
