@@ -1,6 +1,6 @@
 <h1 align="center">ExpressJS - Back End - TiketinAja RESTfull API</h1>
 
-TiketinAja RESTfull API merupakan suatu RESTfull API yang akan menyediakan data-data yang dibutuhkan oleh Front End dari aplikasi TiketinAja. API di desain secara minimalis dan flexsibel dengan penggunaan Express.Js. [More about Express](https://en.wikipedia.org/wiki/Express.js)
+TiketinAja RESTfull API is a RESTfull API that will provide the data needed by the Front End of the TiketinAja application. The API is designed in a minimalist and flexible way with the use of Express.Js. [More about Express](https://en.wikipedia.org/wiki/Express.js)
 
 ## Built With
 
