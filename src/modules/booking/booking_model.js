@@ -11,6 +11,19 @@ module.exports = {
       )
     })
   },
+
+  getDataById: (preId, showId) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT b.booking_id, b.premiere_id, b.show_time_id, bs.booking_seat_location FROM booking b JOIN booking_seat bs ON b.booking_id = bs.booking_id WHERE b.premiere_id = ? AND b.show_time_id = ? AND b.booking_status = ?',
+        [preId, showId, 'succes'],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
   createData: (setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

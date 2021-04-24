@@ -4,6 +4,7 @@ const bookingController = require('./booking_controller')
 
 Route.get('/hello', bookingController.sayHello)
 Route.get('/book', bookingController.getAllBooking)
+Route.get('/book-seat', bookingController.getBookingById)
 Route.get('/seat/:id', bookingController.getBookingSeatById)
 Route.post('/book', bookingController.postBooking)
 

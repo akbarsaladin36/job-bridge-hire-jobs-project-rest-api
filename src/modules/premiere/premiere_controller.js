@@ -6,6 +6,20 @@ module.exports = {
   sayHello: (req, res) => {
     res.status(200).send('Hello Premiere')
   },
+  getPremiereByMovie: async (req, res) => {
+    try {
+      const { id } = req.params
+      let { date, loc } = req.query
+      date = date || '%%'
+      loc = loc || '%%'
+      // console.log(id)
+      // console.log(date, '--', loc)
+      const result = await premiereModel.getDataAllbyMovieLocdate(id, loc, date)
+      return helper.response(res, 200, 'Succes Get Premiere Data', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
   getAllPremiere: async (req, res) => {
     try {
       const result = await premiereModel.getDataAll()

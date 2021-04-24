@@ -15,13 +15,14 @@ module.exports = {
       sort = sort || 'movie_release_date ASC'
 
       page = parseInt(page)
-
       limit = parseInt(limit)
-      const totalData = await movieModel.getDataCount()
+      const offset = page * limit - limit
+
+      const totalData = await movieModel.getDataCount(keywords)
       console.log('Total Data ' + totalData)
       const totalPage = Math.ceil(totalData / limit)
       console.log('Total Page ' + totalPage)
-      const offset = page * limit - limit
+
       const pageInfo = {
         page,
         totalPage,
@@ -29,6 +30,7 @@ module.exports = {
         totalData
       }
       const result = await movieModel.getDataAll(limit, offset, keywords, sort)
+      // console.log('DATA RES', result.length)
       return helper.response(
         res,
         200,
@@ -59,11 +61,23 @@ module.exports = {
   postMovie: async (req, res) => {
     try {
       // console.log(req.body)
-      const { movieName, movieCategory, movieReleaseDate } = req.body
+      const {
+        movieName,
+        movieCategory,
+        movieReleaseDate,
+        movieDuration,
+        movieDirectedBy,
+        movieCasts,
+        movieSynopsis
+      } = req.body
       const setData = {
         movie_name: movieName,
         movie_category: movieCategory,
-        movie_release_date: movieReleaseDate
+        movie_release_date: movieReleaseDate,
+        movie_duration: movieDuration,
+        movie_directed_by: movieDirectedBy,
+        movie_casts: movieCasts,
+        movie_synopsis: movieSynopsis
       }
       // console.log(setData)
       const result = await movieModel.createData(setData)
@@ -79,13 +93,27 @@ module.exports = {
       let result = await movieModel.getDataById(id)
 
       if (result.length > 0) {
-        const { movieName, movieCategory, movieReleaseDate } = req.body
+        const {
+          movieName,
+          movieCategory,
+          movieReleaseDate,
+          movieDuration,
+          movieDirectedBy,
+          movieCasts,
+          movieSynopsis
+        } = req.body
         const setData = {
           movie_name: movieName,
           movie_category: movieCategory,
           movie_release_date: movieReleaseDate,
+          movie_duration: movieDuration,
+          movie_directed_by: movieDirectedBy,
+          movie_casts: movieCasts,
+          movie_synopsis: movieSynopsis,
           movie_updated_at: new Date(Date.now())
         }
+        // console.log(req.body)
+        // console.log(setData)
         result = await movieModel.updateData(setData, id)
         return helper.response(res, 200, 'Succes Update Movie', result)
       } else {

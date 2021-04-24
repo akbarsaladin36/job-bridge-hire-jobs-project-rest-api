@@ -14,6 +14,16 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
+  getBookingById: async (req, res) => {
+    try {
+      console.log(req.query)
+      const { premiereId, showTimeId } = req.query
+      const result = await bookingModel.getDataById(premiereId, showTimeId)
+      return helper.response(res, 200, 'Succes Get Booking Data', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
   getBookingSeatById: async (req, res) => {
     try {
       const { id } = req.params

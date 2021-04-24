@@ -12,10 +12,11 @@ module.exports = {
       )
     })
   },
-  getDataCount: () => {
+  getDataCount: (keywords) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT COUNT(*) AS total FROM movie',
+        'SELECT COUNT(*) AS total FROM movie WHERE movie_name LIKE ?',
+        keywords,
         (error, result) => {
           // console.log(result) isi array dalamnya objek
           !error ? resolve(result[0].total) : reject(new Error(error))
