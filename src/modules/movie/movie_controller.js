@@ -60,7 +60,7 @@ module.exports = {
   },
   postMovie: async (req, res) => {
     try {
-      // console.log(req.body)
+      // console.log('Controller', req.body)
       const {
         movieName,
         movieCategory,
@@ -77,9 +77,10 @@ module.exports = {
         movie_duration: movieDuration,
         movie_directed_by: movieDirectedBy,
         movie_casts: movieCasts,
-        movie_synopsis: movieSynopsis
+        movie_synopsis: movieSynopsis,
+        movie_image: req.file ? req.file.filename : ''
       }
-      // console.log(setData)
+      console.log('POST DATA', setData)
       const result = await movieModel.createData(setData)
       return helper.response(res, 200, 'Succes Create Data', result)
     } catch (error) {
@@ -110,10 +111,20 @@ module.exports = {
           movie_directed_by: movieDirectedBy,
           movie_casts: movieCasts,
           movie_synopsis: movieSynopsis,
+          movie_image: req.file ? req.file.filename : '',
           movie_updated_at: new Date(Date.now())
         }
-        // console.log(req.body)
+        // console.log('UPDATE DATA', req.body)
         // console.log(setData)
+        // console.log('MOVIE IMAGE DB', result[0].movie_image.length)
+
+        if (result[0].movie_image.length > 0) {
+          console.log(`Delete Image${result[0].movie_image}`)
+          const imgLoc = `src/uploads/${result[0].movie_image}`
+          helper.deleteImage(imgLoc)
+        } else {
+          console.log('NO img in DB')
+        }
         result = await movieModel.updateData(setData, id)
         return helper.response(res, 200, 'Succes Update Movie', result)
       } else {
@@ -133,6 +144,10 @@ module.exports = {
       // console.log(req.params)
       const { id } = req.params
       let result = await movieModel.getDataById(id)
+      // console.log(result)
+
+      const imgLoc = `src/uploads/${result[0].movie_image}`
+      helper.deleteImage(imgLoc)
 
       if (result.length > 0) {
         result = await movieModel.deleteData(id)
