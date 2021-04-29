@@ -1,6 +1,8 @@
 const helper = require('../../helpers/wrapper')
 const premiereModel = require('./premiere_model')
 const locationModel = require('./location_model')
+const redis = require('redis')
+const client = redis.createClient()
 
 module.exports = {
   sayHello: (req, res) => {
@@ -15,6 +17,11 @@ module.exports = {
       // console.log(id)
       // console.log(date, '--', loc)
       const result = await premiereModel.getDataAllbyMovieLocdate(id, loc, date)
+      client.setex(
+        `getpremiere:${JSON.stringify(req.params)}${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
       return helper.response(res, 200, 'Succes Get Premiere Data', result)
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
@@ -74,7 +81,8 @@ module.exports = {
         movie_id: movieId,
         location_id: locationId,
         premiere_name: premiereName,
-        premiere_price: premierePrice
+        premiere_price: premierePrice,
+        premiere_logo: req.file ? req.file.filename : ''
       }
       // console.log(setData)
       const result = await premiereModel.createData(setData)
@@ -109,8 +117,19 @@ module.exports = {
           location_id: locationId,
           premiere_name: premiereName,
           premiere_price: premierePrice,
+          premiere_logo: req.file ? req.file.filename : '',
           premiere_updated_at: new Date(Date.now())
         }
+        console.log('Pre data', setData)
+
+        if (result[0].premiere_logo.length > 0) {
+          console.log(`Delete Image${result[0].premiere_logo}`)
+          const imgLoc = `src/uploads/${result[0].premiere_logo}`
+          helper.deleteImage(imgLoc)
+        } else {
+          console.log('NO img in DB')
+        }
+
         result = await premiereModel.updateData(setData, id)
         return helper.response(res, 200, 'Succes Update Premiere', result)
       } else {
@@ -157,6 +176,8 @@ module.exports = {
       let result = await premiereModel.getDataById(id)
 
       if (result.length > 0) {
+        const imgLoc = `src/uploads/${result[0].premiere_logo}`
+        helper.deleteImage(imgLoc)
         result = await premiereModel.deleteData(id)
         return helper.response(
           res,

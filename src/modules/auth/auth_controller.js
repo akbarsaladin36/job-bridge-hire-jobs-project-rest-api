@@ -22,9 +22,17 @@ module.exports = {
       // kondisi cek email adata tidak dalam database
       // jika ada kasih respon gagal
       // jika tidak ada jalakan model create user
-      const result = await authModel.register(setData)
-      delete result.user_password
-      return helper.response(res, 200, 'Succes register User', result)
+      const checkEmailUser = await authModel.getDataCondition({
+        user_email: userEmail
+      })
+
+      if (checkEmailUser.length === 0) {
+        const result = await authModel.register(setData)
+        delete result.user_password
+        return helper.response(res, 200, 'Succes register User', result)
+      } else {
+        return helper.response(res, 400, 'Email has been registered')
+      }
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }

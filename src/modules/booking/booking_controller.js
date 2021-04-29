@@ -1,6 +1,8 @@
 const helper = require('../../helpers/wrapper')
 const bookingModel = require('./booking_model')
 const bookingSeatModel = require('./booking_seat_model')
+const redis = require('redis')
+const client = redis.createClient()
 
 module.exports = {
   sayHello: (req, res) => {
@@ -19,6 +21,11 @@ module.exports = {
       console.log(req.query)
       const { premiereId, showTimeId } = req.query
       const result = await bookingModel.getDataById(premiereId, showTimeId)
+      client.setex(
+        `getbookseat:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
       return helper.response(res, 200, 'Succes Get Booking Data', result)
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)

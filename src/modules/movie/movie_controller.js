@@ -1,5 +1,7 @@
 const helper = require('../../helpers/wrapper')
 const movieModel = require('./movie_model')
+const redis = require('redis')
+const client = redis.createClient()
 
 module.exports = {
   sayHello: (req, res) => {
@@ -30,6 +32,12 @@ module.exports = {
         totalData
       }
       const result = await movieModel.getDataAll(limit, offset, keywords, sort)
+      // simpan data di redis
+      client.setex(
+        `getmovie:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result, pageInfo })
+      )
       // console.log('DATA RES', result.length)
       return helper.response(
         res,
@@ -50,6 +58,8 @@ module.exports = {
       // console.log(result) array ini
 
       if (result.length > 0) {
+        // simpan data kedalam redis
+        client.setex(`getmovie:${id}`, 3600, JSON.stringify(result))
         return helper.response(res, 200, `Succes Get Data by Id ${id}`, result)
       } else {
         return helper.response(res, 404, `Data by Id ${id} not Found !`, null)
@@ -146,10 +156,9 @@ module.exports = {
       let result = await movieModel.getDataById(id)
       // console.log(result)
 
-      const imgLoc = `src/uploads/${result[0].movie_image}`
-      helper.deleteImage(imgLoc)
-
       if (result.length > 0) {
+        const imgLoc = `src/uploads/${result[0].movie_image}`
+        helper.deleteImage(imgLoc)
         result = await movieModel.deleteData(id)
         return helper.response(
           res,
