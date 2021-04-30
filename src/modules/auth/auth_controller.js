@@ -20,9 +20,7 @@ module.exports = {
         user_password: encryptPassword,
         user_phone_number: userPhoneNumber
       }
-      // kondisi cek email adata tidak dalam database
-      // jika ada kasih respon gagal
-      // jika tidak ada jalakan model create user
+
       const checkEmailUser = await authModel.getDataCondition({
         user_email: userEmail
       })
@@ -30,7 +28,18 @@ module.exports = {
       if (checkEmailUser.length === 0) {
         const result = await authModel.register(setData)
         delete result.user_password
-        return helper.response(res, 200, 'Succes register User', result)
+
+        const url = `http://localhost:3001/api/v1/auth/change-data/${result.id}`
+
+        // send email for verificatioan here
+        helper.sendMail('Please activate your account', url, userEmail)
+
+        return helper.response(
+          res,
+          200,
+          'Succes register User Please Check your Email to Activate your Account !',
+          result
+        )
       } else {
         return helper.response(res, 400, 'Email has been registered')
       }
@@ -47,13 +56,13 @@ module.exports = {
       const checkEmailUser = await authModel.getDataCondition({
         user_email: userEmail
       })
-      // console.log(checkEmailUser)
+
       if (checkEmailUser.length > 0) {
         const checkPassword = bcrypt.compareSync(
           userPassword,
           checkEmailUser[0].user_password
         )
-        // console.log(cekPassword)
+
         if (checkPassword) {
           console.log('User berhasil login')
           const payload = checkEmailUser[0]
@@ -61,7 +70,7 @@ module.exports = {
           const token = jwt.sign({ ...payload }, 'RAHASIA', {
             expiresIn: '24h'
           })
-          // console.log(token)
+
           const result = { ...payload, token }
           return helper.response(res, 200, 'Succes Login !', result)
         } else {
@@ -70,7 +79,6 @@ module.exports = {
       } else {
         return helper.response(res, 404, 'Email not Registed')
       }
-      // 2. cek pass sama atau tidak
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
@@ -79,26 +87,37 @@ module.exports = {
   changeData: async (req, res) => {
     try {
       let token = req.params.token
-      // console.log('Token Masuk', token)
-
-      jwt.verify(token, 'RAHASIA', (error, result) => {
-        if (
-          (error && error.name === 'JsonWebTokenError') ||
-          (error && error.name === 'TokenExpiredError')
-        ) {
-          return helper.response(res, 403, error.message)
-        } else {
-          // console.log('DECODE token', result)
-          token = result
-        }
-      })
-      // console.log('DATA LEMPAR', token)
-      const { userId, setData } = token
+      let userId = ''
+      let setData = {}
+      console.log(token)
+      if (/^\d+$/.test(token)) {
+        userId = token
+        setData = { user_verification: 'succes' }
+      } else {
+        jwt.verify(token, 'RAHASIA', (error, result) => {
+          if (
+            (error && error.name === 'JsonWebTokenError') ||
+            (error && error.name === 'TokenExpiredError')
+          ) {
+            return helper.response(res, 403, error.message)
+          } else {
+            // console.log('DECODE token', result)
+            token = result
+          }
+        })
+        userId = token.userId
+        setData = token.setData
+      }
 
       if (userId && setData) {
         console.log('Update', setData)
         const result = await authModel.updateData(setData, userId)
-        return helper.response(res, 200, 'succes update data', result)
+        return helper.response(
+          res,
+          200,
+          'succes update data',
+          Object.keys(result)
+        )
       }
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
@@ -128,9 +147,17 @@ module.exports = {
       const token = jwt.sign({ ...payload }, 'RAHASIA', {
         expiresIn: '24h'
       })
+
       const url = `http://localhost:3001/api/v1/auth/change-data/${token}`
 
       // send email for verificatioan here
+      helper.sendMail(
+        `Confirm your ${Object.keys(setData)
+          .map((e) => e.split('_')[1])
+          .join(' and ')} change `,
+        url,
+        req.decodeToken.user_email
+      )
 
       return helper.response(
         res,

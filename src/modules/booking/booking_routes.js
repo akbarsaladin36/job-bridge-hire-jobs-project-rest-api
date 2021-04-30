@@ -12,7 +12,14 @@ Route.get(
   redisMiddleware.getBookingRedis,
   bookingController.getBookingById
 )
-Route.get('/seat/:id', bookingController.getBookingSeatById)
+
+Route.get(
+  '/user-book',
+  authMiddleware.authentication,
+  redisMiddleware.getBookingRedis,
+  bookingController.getUserHistory
+)
+
 Route.get(
   '/book-sale',
   authMiddleware.authentication,
@@ -20,6 +27,7 @@ Route.get(
   redisMiddleware.getBookingRedis,
   bookingController.getBookingIncome
 )
+
 Route.post(
   '/book',
   authMiddleware.authentication,

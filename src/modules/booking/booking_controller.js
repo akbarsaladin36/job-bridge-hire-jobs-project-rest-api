@@ -34,6 +34,26 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
+  getUserHistory: async (req, res) => {
+    try {
+      const { userId } = req.query
+      // console.log(userId)
+      const result = await bookingModel.getUserData(userId)
+      client.setex(
+        `getbook:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
+      return helper.response(
+        res,
+        200,
+        'Succes get User Booking history !',
+        result
+      )
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
   getBookingById: async (req, res) => {
     try {
       console.log(req.query)
@@ -45,15 +65,6 @@ module.exports = {
         JSON.stringify({ result })
       )
       return helper.response(res, 200, 'Succes Get Booking Data', result)
-    } catch (error) {
-      return helper.response(res, 400, 'Bad Request', error)
-    }
-  },
-  getBookingSeatById: async (req, res) => {
-    try {
-      const { id } = req.params
-      const result = await bookingSeatModel.getDataById(id)
-      return helper.response(res, 200, 'Succes Get Booking Seat Data', result)
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }

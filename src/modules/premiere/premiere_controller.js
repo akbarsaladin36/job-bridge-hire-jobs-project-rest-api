@@ -8,32 +8,14 @@ module.exports = {
   sayHello: (req, res) => {
     res.status(200).send('Hello Premiere')
   },
-  getPremiereByMovie: async (req, res) => {
-    try {
-      const { id } = req.params
-      let { date, loc } = req.query
-      date = date || '%%'
-      loc = loc || '%%'
-      // console.log(id)
-      // console.log(date, '--', loc)
-      const result = await premiereModel.getDataAllbyMovieLocdate(id, loc, date)
-      client.setex(
-        `getpremiere:${JSON.stringify(req.params)}${JSON.stringify(req.query)}`,
-        3600,
-        JSON.stringify({ result })
-      )
-      return helper.response(res, 200, 'Succes Get Premiere Data', result)
-    } catch (error) {
-      return helper.response(res, 400, 'Bad Request', error)
-    }
-  },
   premiereInfoByMovieId: async (req, res) => {
     try {
       // console.log('movie ID', req.params)
 
-      let { movieId, loc, orderBy, limit, page } = req.query
+      let { movieId, loc, date, orderBy, limit, page } = req.query
 
       loc = loc || '%%'
+      date = date || '%%'
       orderBy = orderBy || 'p.premiere_name ASC'
 
       page = parseInt(page)
@@ -63,6 +45,12 @@ module.exports = {
         limit,
         offset
       )
+      for (const e of result) {
+        e.showTime = await premiereModel.showTimeInfoByPremiere(
+          e.premiere_id,
+          date
+        )
+      }
       client.setex(
         `getpremiere:${JSON.stringify(req.query)}`,
         3600,
@@ -74,30 +62,6 @@ module.exports = {
         `Succes get Premiere Info By Movie Id ${movieId}`,
         result,
         pageInfo
-      )
-    } catch (error) {
-      return helper.response(res, 400, 'Bad Request', error)
-    }
-  },
-  showTimeInfoByPremiereId: async (req, res) => {
-    try {
-      // console.log(req.query)
-      let { premiereId, date } = req.query
-      date = date || '%%'
-      const result = await premiereModel.showTimeInfoByPremiere(
-        premiereId,
-        date
-      )
-      client.setex(
-        `getshowtime:${JSON.stringify(req.query)}`,
-        3600,
-        JSON.stringify({ result })
-      )
-      return helper.response(
-        res,
-        200,
-        `Succes Get Show Time Data by Premiere Id ${premiereId}`,
-        result
       )
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)

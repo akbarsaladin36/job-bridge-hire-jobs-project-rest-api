@@ -8,9 +8,10 @@ const {
   changeData
 } = require('./auth_controller')
 
+Route.get('/change-data/:token', changeData)
+
 Route.post('/login', login)
 Route.post('/register', register)
 Route.post('/request-change', authMiddleware.authentication, requestChange)
-Route.post('/change-data/:token', changeData)
 
 module.exports = Route

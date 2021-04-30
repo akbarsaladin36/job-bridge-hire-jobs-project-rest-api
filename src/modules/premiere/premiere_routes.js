@@ -11,20 +11,11 @@ Route.get('/location/:id', premiereController.getLocationById)
 
 Route.get('/main', premiereController.getAllPremiere)
 Route.get('/main/:id', premiereController.getPremiereById)
-// Route.get(
-//   '/premiere-movie/:id',
-//   redisMiddleware.getPremiereByMovie,
-//   premiereController.getPremiereByMovie
-// )
+
 Route.get(
-  '/premiere-info-movie',
+  '/premiere-movie',
   redisMiddleware.getPremiereByMovie,
   premiereController.premiereInfoByMovieId
-)
-Route.get(
-  '/show-time-info-premiere',
-  redisMiddleware.getShowTimeByPremiere,
-  premiereController.showTimeInfoByPremiereId
 )
 
 Route.post(
@@ -34,6 +25,7 @@ Route.post(
   redisMiddleware.clearDataPremiereRedis,
   premiereController.postLocation
 )
+
 Route.post(
   '/main',
   authMiddleware.authentication,
