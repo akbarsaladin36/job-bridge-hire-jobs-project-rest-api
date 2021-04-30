@@ -12,6 +12,18 @@ module.exports = {
     })
   },
 
+  getBookingTotalPrice: (movieId, premiereId) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT m.movie_id, p.premiere_id, b.booking_total_price, b.booking_created_at FROM booking b JOIN premiere p ON b.premiere_id = p.premiere_id JOIN movie m ON p.movie_id = m.movie_id WHERE m.movie_id = ? AND p.premiere_id = ?',
+        [movieId, premiereId],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
   getDataById: (preId, showId) => {
     return new Promise((resolve, reject) => {
       connection.query(

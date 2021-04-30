@@ -55,7 +55,7 @@ module.exports = {
   },
   getPremiereByMovie: (req, res, next) => {
     client.get(
-      `getpremiere:${JSON.stringify(req.params)}${JSON.stringify(req.query)}`,
+      `getpremiere:${JSON.stringify(req.query)}`, // getpremiere:${JSON.stringify(req.params)}${JSON.stringify(req.query)}
       (error, result) => {
         if (!error && result != null) {
           console.log('data ada dalam redis')
@@ -74,6 +74,24 @@ module.exports = {
       }
     )
   },
+  getShowTimeByPremiere: (req, res, next) => {
+    client.get(`getshowtime:${JSON.stringify(req.query)}`, (error, result) => {
+      if (!error && result != null) {
+        console.log('data ada dalam redis')
+        const newResult = JSON.parse(result)
+        return helper.response(
+          res,
+          200,
+          'Succes Get Show Time Data by Premiere Id (redis)',
+          newResult.result,
+          newResult.pageInfo
+        )
+      } else {
+        console.log('data tidak ada dalam redis')
+        next()
+      }
+    })
+  },
   clearDataPremiereRedis: (req, res, next) => {
     client.keys('getpremiere*', (_error, result) => {
       console.log('isi key dalam redis', result)
@@ -85,8 +103,8 @@ module.exports = {
       next()
     })
   },
-  getBookingSeatRedis: (req, res, next) => {
-    client.get(`getbookseat:${JSON.stringify(req.query)}`, (error, result) => {
+  getBookingRedis: (req, res, next) => {
+    client.get(`getbook:${JSON.stringify(req.query)}`, (error, result) => {
       if (!error && result != null) {
         console.log('data ada dalam redis')
         const newResult = JSON.parse(result)

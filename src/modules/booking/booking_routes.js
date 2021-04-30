@@ -9,10 +9,17 @@ Route.get('/book', bookingController.getAllBooking)
 Route.get(
   '/book-seat',
   authMiddleware.authentication,
-  redisMiddleware.getBookingSeatRedis,
+  redisMiddleware.getBookingRedis,
   bookingController.getBookingById
 )
 Route.get('/seat/:id', bookingController.getBookingSeatById)
+Route.get(
+  '/book-sale',
+  authMiddleware.authentication,
+  authMiddleware.isAdmin,
+  redisMiddleware.getBookingRedis,
+  bookingController.getBookingIncome
+)
 Route.post(
   '/book',
   authMiddleware.authentication,

@@ -27,6 +27,82 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
+  premiereInfoByMovieId: async (req, res) => {
+    try {
+      // console.log('movie ID', req.params)
+
+      let { movieId, loc, orderBy, limit, page } = req.query
+
+      loc = loc || '%%'
+      orderBy = orderBy || 'p.premiere_name ASC'
+
+      page = parseInt(page)
+      limit = parseInt(limit)
+      const offset = page * limit - limit
+      const totalData = await premiereModel.getCountPremiere(
+        movieId,
+        loc,
+        orderBy
+      )
+      console.log('total data pre', totalData)
+      console.log('Total Data ' + totalData)
+      const totalPage = Math.ceil(totalData / limit)
+      console.log('Total Page ' + totalPage)
+
+      const pageInfo = {
+        page,
+        totalPage,
+        limit,
+        totalData
+      }
+
+      const result = await premiereModel.premiereInfoByMovie(
+        movieId,
+        loc,
+        orderBy,
+        limit,
+        offset
+      )
+      client.setex(
+        `getpremiere:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
+      return helper.response(
+        res,
+        200,
+        `Succes get Premiere Info By Movie Id ${movieId}`,
+        result,
+        pageInfo
+      )
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+  showTimeInfoByPremiereId: async (req, res) => {
+    try {
+      // console.log(req.query)
+      let { premiereId, date } = req.query
+      date = date || '%%'
+      const result = await premiereModel.showTimeInfoByPremiere(
+        premiereId,
+        date
+      )
+      client.setex(
+        `getshowtime:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
+      return helper.response(
+        res,
+        200,
+        `Succes Get Show Time Data by Premiere Id ${premiereId}`,
+        result
+      )
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
   getAllPremiere: async (req, res) => {
     try {
       const result = await premiereModel.getDataAll()

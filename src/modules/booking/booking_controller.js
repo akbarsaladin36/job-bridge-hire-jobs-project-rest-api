@@ -16,13 +16,31 @@ module.exports = {
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
+  getBookingIncome: async (req, res) => {
+    try {
+      // console.log(req.query)
+      const { movieId, premiereId } = req.query
+      const result = await bookingModel.getBookingTotalPrice(
+        movieId,
+        premiereId
+      )
+      client.setex(
+        `getbook:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result })
+      )
+      return helper.response(res, 200, 'Succes Get Booking Income Data', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
   getBookingById: async (req, res) => {
     try {
       console.log(req.query)
       const { premiereId, showTimeId } = req.query
       const result = await bookingModel.getDataById(premiereId, showTimeId)
       client.setex(
-        `getbookseat:${JSON.stringify(req.query)}`,
+        `getbook:${JSON.stringify(req.query)}`,
         3600,
         JSON.stringify({ result })
       )
