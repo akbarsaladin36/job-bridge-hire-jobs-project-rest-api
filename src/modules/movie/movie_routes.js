@@ -5,7 +5,7 @@ const authMiddleware = require('../../middleware/auth')
 const uploadFile = require('../../middleware/uploads')
 const redisMiddleware = require('../../middleware/redis')
 
-Route.get('/hello', movieController.sayHello)
+Route.get('/name', movieController.getMovieName)
 Route.get('/', redisMiddleware.getMovieRedis, movieController.getAllMovie)
 
 Route.get(

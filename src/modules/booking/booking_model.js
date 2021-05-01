@@ -12,11 +12,11 @@ module.exports = {
     })
   },
 
-  getBookingTotalPrice: (movieId, premiereId) => {
+  getBookingTotalPrice: (movieId, premiereName, locationAddress) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT MONTH(b.booking_created_at) AS month, SUM(b.booking_total_price) AS total FROM booking b JOIN premiere p ON b.premiere_id = p.premiere_id JOIN movie m ON p.movie_id = m.movie_id WHERE m.movie_id = ? AND p.premiere_id = ? GROUP BY MONTH(b.booking_created_at)',
-        [movieId, premiereId],
+        'SELECT MONTH(b.booking_created_at) AS month, SUM(b.booking_total_price) AS total FROM booking b JOIN premiere p ON b.premiere_id = p.premiere_id JOIN movie m ON p.movie_id = m.movie_id JOIN location l ON p.location_id = l.location_id WHERE m.movie_id = ? AND p.premiere_name = ? AND l.location_addres = ? GROUP BY MONTH(b.booking_created_at)',
+        [movieId, premiereName, locationAddress],
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
         }

@@ -5,7 +5,7 @@ const authMiddleware = require('../../middleware/auth')
 const uploadFile = require('../../middleware/uploads')
 const redisMiddleware = require('../../middleware/redis')
 
-Route.get('/hello', premiereController.sayHello)
+Route.get('/name', premiereController.getPremiereName)
 Route.get('/location', premiereController.getAllLocation)
 Route.get('/location/:id', premiereController.getLocationById)
 

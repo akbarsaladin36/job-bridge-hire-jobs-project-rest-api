@@ -19,10 +19,11 @@ module.exports = {
   getBookingIncome: async (req, res) => {
     try {
       // console.log(req.query)
-      const { movieId, premiereId } = req.query
+      const { movieId, premiereName, locationAddress } = req.query
       const result = await bookingModel.getBookingTotalPrice(
         movieId,
-        premiereId
+        premiereName,
+        locationAddress
       )
       client.setex(
         `getbook:${JSON.stringify(req.query)}`,

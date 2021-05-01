@@ -4,8 +4,13 @@ const redis = require('redis')
 const client = redis.createClient()
 
 module.exports = {
-  sayHello: (req, res) => {
-    res.status(200).send('Hello Movie')
+  getMovieName: async (req, res) => {
+    try {
+      const result = await movieModel.movieName()
+      return helper.response(res, 200, 'Succes get movie name', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad Request', error)
+    }
   },
   getAllMovie: async (req, res) => {
     try {
