@@ -19,6 +19,8 @@ module.exports = {
 
       let { movieId, loc, date, orderBy, limit, page } = req.query
 
+      limit = limit || '6'
+      page = page || '1'
       loc = loc || '%%'
       date = date || '%%'
       orderBy = orderBy || 'p.premiere_name ASC'

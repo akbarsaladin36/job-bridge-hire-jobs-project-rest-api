@@ -18,6 +18,8 @@ module.exports = {
       let { page, limit, sort, keywords } = req.query
       console.log(sort)
 
+      limit = limit || '6'
+      page = page || '1'
       keywords = keywords || '%'
       sort = sort || 'movie_release_date ASC'
 
