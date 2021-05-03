@@ -22,7 +22,7 @@ TiketinAja RESTfull API is a RESTfull API that will provide the data needed by t
 4. Turn on Web Server and MySQL can using Third-party tool like xampp, etc.
 5. Create a database with the name #nama_database, and Import file sql to **phpmyadmin**
 6. Open Postman desktop application or Chrome web app extension that has installed before
-7. Choose HTTP Method and enter request url.(ex. localhost:3000/)
+7. Choose HTTP Method and enter request url.(ex. localhost:3001/)
 8. You can see all the end point [here](https://documenter.getpostman.com/view/14948086/TzJoF1dZ)
 
 ## Set up .env file
@@ -30,11 +30,13 @@ TiketinAja RESTfull API is a RESTfull API that will provide the data needed by t
 Open .env file on your favorite code editor, and copy paste this code below :
 
 ```
-PORT=3000
+PORT=3001
 DB_HOST=localhost
 DB_USER=root
 DB_PASS=
 DB_NAME=tiketinaja
+SMTP_EMAIL= [your email (Gmail)]
+SMTP_PASSWORD= [your email password]
 ```
 
 ## License
