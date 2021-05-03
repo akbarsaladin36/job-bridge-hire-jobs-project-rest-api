@@ -1,4 +1,4 @@
-const helper = require('../../helpers/wrapper')
+const helper = require('../../helpers')
 const showTimeModel = require('./show_time_model')
 
 module.exports = {

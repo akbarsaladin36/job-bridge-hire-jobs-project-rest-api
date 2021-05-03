@@ -1,4 +1,4 @@
-const helper = require('../../helpers/wrapper')
+const helper = require('../../helpers')
 const bcrypt = require('bcrypt')
 const authModel = require('./auth_model')
 const jwt = require('jsonwebtoken')
@@ -7,7 +7,13 @@ module.exports = {
   register: async (req, res) => {
     try {
       // console.log(req.body)
-      const { userEmail, userPassword, userName, userPhoneNumber } = req.body
+      const {
+        userEmail,
+        userPassword,
+        firstName,
+        lastName,
+        userPhoneNumber
+      } = req.body
 
       const salt = bcrypt.genSaltSync(10)
       const encryptPassword = bcrypt.hashSync(userPassword, salt)
@@ -15,7 +21,7 @@ module.exports = {
       console.log(`after Encrypt = ${encryptPassword}`)
 
       const setData = {
-        user_name: userName,
+        user_name: firstName + ' ' + lastName,
         user_email: userEmail,
         user_password: encryptPassword,
         user_phone_number: userPhoneNumber
@@ -130,6 +136,16 @@ module.exports = {
         const salt = bcrypt.genSaltSync(10)
         const encryptPassword = bcrypt.hashSync(req.body.userPassword, salt)
         req.body.userPassword = encryptPassword
+      } else if (req.body.userEmail) {
+        const checkEmailUser = await authModel.getDataCondition({
+          user_email: req.body.userEmail
+        })
+        console.log(req.body.userEmail)
+        if (checkEmailUser.length > 0) {
+          return helper.response(res, 400, 'Email has been registered')
+        }
+      } else {
+        return helper.response(res, 400, 'Bad Request')
       }
       // console.log('PASSS', req.body.userPassword)
 
@@ -156,7 +172,7 @@ module.exports = {
           .map((e) => e.split('_')[1])
           .join(' and ')} change `,
         url,
-        req.decodeToken.user_email
+        req.body.userEmail ? req.body.userEmail : req.decodeToken.user_email
       )
 
       return helper.response(

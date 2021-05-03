@@ -1,4 +1,4 @@
-const helper = require('../../helpers/wrapper')
+const helper = require('../../helpers')
 const bookingModel = require('./booking_model')
 const bookingSeatModel = require('./booking_seat_model')
 const redis = require('redis')

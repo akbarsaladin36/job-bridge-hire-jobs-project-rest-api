@@ -1,5 +1,5 @@
 const multer = require('multer')
-const helper = require('../helpers/wrapper')
+const helper = require('../helpers')
 const path = require('path')
 
 const storage = multer.diskStorage({
