@@ -64,6 +64,10 @@ module.exports = {
       })
 
       if (checkEmailUser.length > 0) {
+        if (checkEmailUser[0].user_verification === 'pending') {
+          return helper.response(res, 403, 'Account is not verified')
+        }
+
         const checkPassword = bcrypt.compareSync(
           userPassword,
           checkEmailUser[0].user_password

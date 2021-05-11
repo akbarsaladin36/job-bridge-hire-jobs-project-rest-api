@@ -109,6 +109,7 @@ module.exports = {
       const { id } = req.params
       // kondisi pengecekan apakah data ada dalam database berdasarakan id
       let result = await movieModel.getDataById(id)
+      // console.log(result[0], '--', req.file)
 
       if (result.length > 0) {
         const {
@@ -128,20 +129,24 @@ module.exports = {
           movie_directed_by: movieDirectedBy,
           movie_casts: movieCasts,
           movie_synopsis: movieSynopsis,
-          movie_image: req.file ? req.file.filename : '',
+          movie_image: req.file ? req.file.filename : result[0].movie_image,
           movie_updated_at: new Date(Date.now())
+        }
+
+        if (req.file) {
+          console.log('ada file')
+          if (result[0].movie_image.length > 0) {
+            console.log(`Delete Image${result[0].movie_image}`)
+            const imgLoc = `src/uploads/${result[0].movie_image}`
+            helper.deleteImage(imgLoc)
+          } else {
+            console.log('NO img in DB')
+          }
         }
         // console.log('UPDATE DATA', req.body)
         // console.log(setData)
         // console.log('MOVIE IMAGE DB', result[0].movie_image.length)
 
-        if (result[0].movie_image.length > 0) {
-          console.log(`Delete Image${result[0].movie_image}`)
-          const imgLoc = `src/uploads/${result[0].movie_image}`
-          helper.deleteImage(imgLoc)
-        } else {
-          console.log('NO img in DB')
-        }
         result = await movieModel.updateData(setData, id)
         return helper.response(res, 200, 'Succes Update Movie', result)
       } else {

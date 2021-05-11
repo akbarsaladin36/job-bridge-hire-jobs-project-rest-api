@@ -27,7 +27,7 @@ module.exports = {
   getUserData: (userId) => {
     return new Promise((resolve, reject) => {
       connection.query(
-        'SELECT b.booking_ticket, b.booking_total_price, b.booking_payment_method, p.premiere_logo, p.premiere_name, m.movie_name, m.movie_category, m.movie_duration FROM booking b JOIN premiere p ON b.premiere_id = p.premiere_id JOIN movie m ON p.movie_id = m.movie_id WHERE b.user_id = ?',
+        'SELECT s.show_time_date, s.show_time_clock, b.booking_ticket, b.booking_total_price, b.booking_payment_method, p.premiere_logo, p.premiere_name, m.movie_name, m.movie_category, m.movie_duration FROM booking b JOIN premiere p ON b.premiere_id = p.premiere_id JOIN movie m ON p.movie_id = m.movie_id JOIN show_time s ON b.show_time_id = s.show_time_id WHERE b.user_id = ?',
         userId,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
