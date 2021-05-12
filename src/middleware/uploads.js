@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
     cb(null, 'src/uploads')
   },
   filename: function (req, file, cb) {
-    // console.log(file)
     cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
   }
 })
@@ -22,7 +21,6 @@ const fileFilter = (req, file, callback) => {
   }
 }
 
-// tambahkan limit
 const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -37,7 +35,6 @@ const uploadFilter = (req, res, next) => {
       return helper.response(res, 401, err.message, null)
     }
     next()
-    // Everything went fine.
   })
 }
 
