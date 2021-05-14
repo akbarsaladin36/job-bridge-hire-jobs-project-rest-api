@@ -5,6 +5,6 @@ const workerController = require('./worker_controller')
 // const uploadFile = require('../../middleware/uploads')
 // const redisMiddleware = require('../../middleware/redis')
 
-Route.get('/', workerController.sayHello)
+Route.get('/', workerController.getWorker)
 
 module.exports = Route
