@@ -1,7 +1,7 @@
 const helper = require('../../helpers')
 const workerModel = require('./worker_model')
-// const redis = require('redis')
-// const client = redis.createClient()
+const redis = require('redis')
+const client = redis.createClient()
 
 module.exports = {
   getWorker: async (req, res) => {
@@ -35,6 +35,12 @@ module.exports = {
         delete e.password_worker
       }
 
+      client.setex(
+        `getworker:${JSON.stringify(req.query)}`,
+        3600,
+        JSON.stringify({ result, pageInfo })
+      )
+
       return helper.response(res, 200, 'Succes get data !', result, pageInfo)
     } catch (error) {
       // console.log(error)
@@ -61,6 +67,9 @@ module.exports = {
         'portofolio',
         id
       )
+
+      client.setex(`getworker:${id}`, 3600, JSON.stringify(result))
+
       return helper.response(res, 200, 'Succes get data !', result)
     } catch (error) {
       // console.log(error)
