@@ -5,7 +5,6 @@ const bcrypt = require('bcrypt')
 require('dotenv').config()
 
 module.exports = {
-
   getDataById: async (req, res) => {
     try {
       const { id } = req.params
@@ -19,13 +18,13 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   },
-  createRecruiter: async (req, res) => {
+
+  updateRecruiter: async (req, res) => {
     try {
+      const { id } = req.params
+      const isExist = await recruiterModel.getDataById(id)
+      // console.log(isExist[0].company_name)
       const {
-        representationName,
-        position,
-        email,
-        password,
         companyName,
         field,
         city,
@@ -34,39 +33,6 @@ module.exports = {
         instagram,
         phoneNumber,
         linkedIn
-      } = req.body
-      const salt = bcrypt.genSaltSync(10)
-      const encryptedPassword = bcrypt.hashSync(password, salt)
-      const setData = {
-        is_verified: 0,
-        fullname_representation_company: representationName,
-        position_representation_company: position,
-        email_representation_company: email,
-        password_company: encryptedPassword,
-        company_name: companyName,
-        company_field: field,
-        company_city: city,
-        company_desc: description,
-        company_email: companyEmail,
-        company_instagram: instagram,
-        company_phone_number: phoneNumber,
-        company_linkedin: linkedIn,
-        company_image: req.file ? req.file.filename : ''
-      }
-      const result = await recruiterModel.createRecruiter(setData)
-      return helper.response(res, 200, 'Data created', result)
-    } catch (error) {
-      console.log(error)
-      return helper.response(res, 400, 'Bad request', Error)
-    }
-  },
-  updateRecruiter: async (req, res) => {
-    try {
-      const { id } = req.params
-      const isExist = await recruiterModel.getDataById(id)
-      // console.log(isExist[0].company_name)
-      const {
-        companyName, field, city, description, companyEmail, instagram, phoneNumber, linkedIn
       } = req.body
       const setData = {
         company_name: companyName,
@@ -158,7 +124,12 @@ module.exports = {
         // console.log(isExpired)
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
           // console.log(req.body)
-          return helper.response(res, 300, 'Otp mismatch or token invalid', null)
+          return helper.response(
+            res,
+            300,
+            'Otp mismatch or token invalid',
+            null
+          )
         } else {
           const id = isExist[0].id_company
           const setData = {
@@ -172,5 +143,4 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   }
-
 }
