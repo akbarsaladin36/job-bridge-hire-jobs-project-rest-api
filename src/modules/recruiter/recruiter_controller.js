@@ -7,7 +7,6 @@ const client = redis.createClient()
 require('dotenv').config()
 
 module.exports = {
-
   getRecruiterById: async (req, res) => {
     try {
       const { id } = req.params
@@ -35,7 +34,14 @@ module.exports = {
         return helper.response(res, 404, 'cannot update empty field', null)
       } else {
         const {
-          companyName, field, city, description, companyEmail, instagram, phoneNumber, linkedIn
+          companyName,
+          field,
+          city,
+          description,
+          companyEmail,
+          instagram,
+          phoneNumber,
+          linkedIn
         } = req.body
 
         const setData = {
@@ -53,7 +59,17 @@ module.exports = {
           company_updated_at: new Date(Date.now())
         }
 
-        helper.deleteImage(isExist[0].company_image)
+        if (req.file) {
+          console.log('ada file')
+          if (isExist[0].company_image.length > 0) {
+            console.log(`Delete Image${isExist[0].company_image}`)
+            const imgLoc = `src/uploads/${isExist[0].company_image}`
+            helper.deleteImage(imgLoc)
+          } else {
+            console.log('NO img in DB')
+          }
+        }
+
         const result = await recruiterModel.updateRecruiter(setData, id)
         return helper.response(res, 200, 'success update data', result)
       }
@@ -144,7 +160,12 @@ module.exports = {
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
           console.log(isExist[0].reset_token)
           console.log(otp)
-          return helper.response(res, 300, 'Otp mismatch or has been expired', null)
+          return helper.response(
+            res,
+            300,
+            'Otp mismatch or has been expired',
+            null
+          )
         } else {
           const id = isExist[0].id_company
           const setData = {
