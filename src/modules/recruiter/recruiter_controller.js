@@ -1,100 +1,95 @@
 const helper = require('./../../helpers/index')
 const recruiterModel = require('./recruiter_model')
-const nodemailer = require('nodemailer')
-const fs = require('fs')
 const bcrypt = require('bcrypt')
+const nodemailer = require('nodemailer')
+const redis = require('redis')
+const client = redis.createClient()
 require('dotenv').config()
 
 module.exports = {
-  getDataById: async (req, res) => {
+
+  getRecruiterById: async (req, res) => {
     try {
       const { id } = req.params
       const result = await recruiterModel.getDataById(id)
-      if (result.length > 0) {
-        return helper.response(res, 200, 'Success', result)
+
+      if (result.length === 0) {
+        return helper.response(res, 404, `recruiter id ${id} not found`, null)
       } else {
-        return helper.response(res, 404, 'Not found', null)
+        delete result[0].password_company
+        client.setex(`getRecruiter:${id}`, 3600, JSON.stringify(result))
+
+        return helper.response(res, 200, `recruiter id ${id} found`, result)
       }
     } catch (error) {
-      return helper.response(res, 400, 'Bad request', Error)
+      return helper.response(res, 400, 'bad request', Error)
     }
   },
+
   updateRecruiter: async (req, res) => {
     try {
       const { id } = req.params
       const isExist = await recruiterModel.getDataById(id)
-      // console.log(isExist[0].company_name)
-      const {
-        companyName,
-        field,
-        city,
-        description,
-        companyEmail,
-        instagram,
-        phoneNumber,
-        linkedIn
-      } = req.body
-      const setData = {
-        company_name: companyName,
-        company_field: field,
-        company_city: city,
-        company_desc: description,
-        company_email: companyEmail,
-        company_instagram: instagram,
-        company_phone_number: phoneNumber,
-        company_linkedin: linkedIn,
-        company_image: req.file ? req.file.filename : '',
-        company_updated_at: new Date(Date.now())
-      }
+
       if (isExist.length === 0) {
-        return helper.response(res, 404, 'Id does not exist', null)
+        return helper.response(res, 404, 'cannot update empty field', null)
       } else {
-        const result = recruiterModel.updateRecruiter(setData, id)
-        const fileExist = fs.existsSync(`/src/uploads/${isExist[0].company_image}`)
-        if (fileExist) {
-          fs.unlink(`/src/uploads/${isExist[0].company_image}`, (error, result) => {
-            console.log(isExist[0].company_image)
-            if (error) throw error
-            console.log('unlink succeed')
-          })
+        const {
+          companyName, field, city, description, companyEmail, instagram, phoneNumber, linkedIn
+        } = req.body
+
+        const setData = {
+          company_name: companyName,
+          company_field: field,
+          company_city: city,
+          company_desc: description,
+          company_email: companyEmail,
+          company_instagram: instagram,
+          company_phone_number: phoneNumber,
+          company_linkedin: linkedIn,
+          company_image: req.file
+            ? req.file.filename
+            : isExist[0].company_image,
+          company_updated_at: new Date(Date.now())
         }
-        return helper.response(res, 200, 'Data updated', result)
+
+        helper.deleteImage(isExist[0].company_image)
+        const result = await recruiterModel.updateRecruiter(setData, id)
+        return helper.response(res, 200, 'success update data', result)
       }
     } catch (error) {
-      console.log(error)
-      return helper.response(res, 400, 'Bad request', Error)
+      return helper.response(res, 400, 'bad request', Error)
     }
   },
+
   deleteRecruiter: async (req, res) => {
     try {
       const { id } = req.params
       const isExist = await recruiterModel.getDataById(id)
-      if (isExist.length > 0) {
-        const result = await recruiterModel.deleteRecruiter(id)
-        const fileExist = fs.existsSync(`/src/uploads/${isExist[0].company_image}`)
-        if (fileExist) {
-          fs.unlink(`/src/uploads/${isExist[0].company_image}`, (error, result) => {
-            console.log(isExist[0].company_image)
-            if (error) throw error
-            console.log('unlink succeed')
-          })
-        }
-        return helper.response(res, 200, 'Data deleted', result)
+
+      if (isExist.length === 0) {
+        return helper.response(res, 404, 'cannot delete empty data')
       } else {
-        return helper.response(res, 404, 'Data not found')
+        helper.deleteImage(isExist[0].company_image)
+        const result = await recruiterModel.deleteRecruiter(id)
+
+        return helper.response(res, 200, 'data deleted', result || null)
       }
     } catch (error) {
-      return helper.response(res, 400, 'Bad request', Error)
+      return helper.response(res, 400, 'bad request', Error)
     }
   },
+
   passChangeRequest: async (req, res) => {
     try {
       const { email } = req.body
       const isExist = await recruiterModel.getDataByEmail(email)
+
       if (isExist.length === 0) {
-        return helper.response(res, 404, 'Cannot update empty data', null)
+        return helper.response(res, 404, 'Email not recognized', null)
       } else {
         const token = Math.ceil(Math.random() * 9001) + 998
+
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -102,6 +97,7 @@ module.exports = {
             pass: process.env.emailPass
           }
         })
+
         const mailOptions = {
           from: 'thisisoxlade@gmail.com',
           to: isExist[0].email_representation_company,
@@ -112,15 +108,18 @@ module.exports = {
           <p>Token will automatically expired in 5 minutes.</p>
           `
         }
+
         transporter.sendMail(mailOptions, (err, info) => {
           if (err) throw err
           console.log('email sent: ' + info.response)
         })
+
         const id = isExist[0].id_company
         const setData = {
           company_updated_at: new Date(Date.now()),
           reset_token: token
         }
+
         const result = await recruiterModel.updateRecruiter(setData, id)
         return helper.response(res, 200, 'OTP sent', result)
       }
@@ -129,25 +128,23 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   },
-  passChange: async (req, res) => {
+
+  changePassword: async (req, res) => {
     try {
       const { email, otp, newPassword } = req.body
+
       const salt = bcrypt.genSaltSync(10)
       const encryptedPassword = bcrypt.hashSync(newPassword, salt)
       const isExist = await recruiterModel.getDataByEmail(email)
+
       if (isExist.length === 0) {
-        return helper.response(res, 404, 'Cannot update empty data', null)
+        return helper.response(res, 404, 'Email not recognized', null)
       } else {
         const isExpired = new Date(Date.now()) - isExist[0].company_updated_at
-        // console.log(isExpired)
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
-          // console.log(req.body)
-          return helper.response(
-            res,
-            300,
-            'Otp mismatch or token invalid',
-            null
-          )
+          console.log(isExist[0].reset_token)
+          console.log(otp)
+          return helper.response(res, 300, 'Otp mismatch or has been expired', null)
         } else {
           const id = isExist[0].id_company
           const setData = {

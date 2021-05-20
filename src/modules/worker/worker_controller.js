@@ -223,7 +223,6 @@ module.exports = {
       const isExist = await workerModel.getWorkerByEmail(email)
 
       if (isExist.length === 0) {
-        console.log(email)
         return helper.response(res, 404, 'Email not recognized', null)
       } else {
         const token = Math.ceil(Math.random() * 9001) + 998

@@ -7,20 +7,22 @@ const redisMiddleware = require('../../middleware/redis')
 Route.get('/hello', (req, res) => {
   res.send('Hello world')
 })
+
 Route.get('/:id',
   redisMiddleware.getRecruiterByIdRedis,
-  recruiterController.getDataById)
-// Route.post('/',
-//   uploadFile,
-//   recruiterController.createRecruiter)
-Route.patch('/:id',
+  recruiterController.getRecruiterById)
+
+Route.patch('/update/:id',
   uploadFile,
   recruiterController.updateRecruiter)
+
 Route.delete('/:id',
   recruiterController.deleteRecruiter)
-Route.post('/request/',
+
+Route.patch('/request',
   recruiterController.passChangeRequest)
-Route.post('/request/changepassword',
-  recruiterController.passChange)
+
+Route.patch('/change-password',
+  recruiterController.changePassword)
 
 module.exports = Route
