@@ -2,6 +2,7 @@ const helper = require('./../../helpers/index')
 const recruiterModel = require('./recruiter_model')
 const nodemailer = require('nodemailer')
 const bcrypt = require('bcrypt')
+require('dotenv').config()
 
 module.exports = {
 
@@ -131,8 +132,8 @@ module.exports = {
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: 'thisisoxlade@gmail.com',
-            pass: 'Rasamala2'
+            user: process.env.email,
+            pass: process.env.emailPass
           }
         })
         const mailOptions = {
