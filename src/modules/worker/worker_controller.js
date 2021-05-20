@@ -100,7 +100,7 @@ module.exports = {
       setData.image_worker = req.file
         ? req.file.filename
         : checkWorker[0].image_worker
-      setData.worker_updatetd_at = new Date(Date.now())
+      setData.worker_updated_at = new Date(Date.now())
       // console.log(setData)
 
       if (req.file) {
@@ -254,7 +254,7 @@ module.exports = {
 
         const id = isExist[0].id_worker
         const setData = {
-          worker_updatetd_at: new Date(Date.now()),
+          worker_updated_at: new Date(Date.now()),
           reset_token: token
         }
 
@@ -278,7 +278,7 @@ module.exports = {
       if (isExist.length === 0) {
         return helper.response(res, 404, 'Email not recognized', null)
       } else {
-        const isExpired = new Date(Date.now()) - isExist[0].worker_updatetd_at
+        const isExpired = new Date(Date.now()) - isExist[0].worker_updated_at
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
           console.log(isExist)
           return helper.response(res, 300, 'Otp mismatch or has been expired', null)
@@ -286,7 +286,7 @@ module.exports = {
           const id = isExist[0].id_worker
           const setData = {
             password_worker: encryptedPassword,
-            worker_updatetd_at: new Date(Date.now())
+            worker_updated_at: new Date(Date.now())
           }
           const result = await workerModel.updateWorker(setData, id)
           return helper.response(res, 200, 'Password changed', result)
