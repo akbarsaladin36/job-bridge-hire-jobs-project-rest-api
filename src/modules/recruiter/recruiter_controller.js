@@ -66,25 +66,9 @@ module.exports = {
       const isExist = await recruiterModel.getDataById(id)
       // console.log(isExist[0].company_name)
       const {
-        representationName,
-        position,
-        email,
-        password,
-        companyName,
-        field,
-        city,
-        description,
-        companyEmail,
-        instagram,
-        phoneNumber,
-        linkedIn
+        companyName, field, city, description, companyEmail, instagram, phoneNumber, linkedIn
       } = req.body
       const setData = {
-        is_verified: 0,
-        fullname_representation_company: representationName,
-        position_representation_company: position,
-        email_representation_company: email,
-        password_company: password,
         company_name: companyName,
         company_field: field,
         company_city: city,

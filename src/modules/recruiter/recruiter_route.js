@@ -13,9 +13,13 @@ Route.get('/:id',
 Route.post('/',
   uploadFile,
   recruiterController.createRecruiter)
-Route.patch('/:id', recruiterController.updateRecruiter)
-Route.delete('/:id', recruiterController.deleteRecruiter)
-Route.post('/request/', recruiterController.passChangeRequest)
-Route.post('/request/changepassword', recruiterController.passChange)
+Route.patch('/:id',
+  recruiterController.updateRecruiter)
+Route.delete('/:id',
+  recruiterController.deleteRecruiter)
+Route.post('/request/',
+  recruiterController.passChangeRequest)
+Route.post('/request/changepassword',
+  recruiterController.passChange)
 
 module.exports = Route
