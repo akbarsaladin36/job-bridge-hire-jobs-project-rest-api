@@ -1,5 +1,7 @@
 const helper = require('./../../helpers/index')
 const recruiterModel = require('./recruiter_model')
+const redis = require('redis')
+const client = redis.createClient()
 
 module.exports = {
   getDataById: async (req, res) => {
@@ -7,6 +9,7 @@ module.exports = {
       const { id } = req.params
       const result = await recruiterModel.getDataById(id)
       if (result.length > 0) {
+        client.setex(`getcompany:${id}`, 3600, JSON.stringify(result))
         return helper.response(res, 200, 'Success', result)
       } else {
         return helper.response(res, 404, 'Not found', null)
@@ -15,103 +18,54 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   },
-  createRecruiter: async (req, res) => {
-    try {
-      const {
-        representationName,
-        position,
-        email,
-        password,
-        companyName,
-        field,
-        city,
-        description,
-        companyEmail,
-        instagram,
-        phoneNumber,
-        linkedIn
-      } = req.body
-      const setData = {
-        is_verified: 0,
-        fullname_representation_company: representationName,
-        position_representation_company: position,
-        email_representation_company: email,
-        password_company: password,
-        company_name: companyName,
-        company_field: field,
-        company_city: city,
-        company_desc: description,
-        company_email: companyEmail,
-        company_instagram: instagram,
-        company_phone_number: phoneNumber,
-        company_linkedin: linkedIn,
-        company_image: req.file ? req.file.filename : ''
-      }
-      const result = await recruiterModel.createRecruiter(setData)
-      return helper.response(res, 200, 'Data created', result)
-    } catch (error) {
-      console.log(error)
-      return helper.response(res, 400, 'Bad request', Error)
-    }
-  },
+
   updateRecruiter: async (req, res) => {
     try {
       const { id } = req.params
       const isExist = await recruiterModel.getDataById(id)
-      // console.log(isExist[0].company_name)
+
       const {
-        representationName,
-        position,
-        email,
-        password,
         companyName,
-        field,
-        city,
-        description,
+        companyField,
+        companyCity,
+        companyDescription,
         companyEmail,
-        instagram,
-        phoneNumber,
-        linkedIn
+        companyInstagram,
+        companyPhoneNumber,
+        companyLinkedIn
       } = req.body
       const setData = {
-        is_verified: 0,
-        fullname_representation_company: representationName,
-        position_representation_company: position,
-        email_representation_company: email,
-        password_company: password,
         company_name: companyName,
-        company_field: field,
-        company_city: city,
-        company_desc: description,
+        company_field: companyField,
+        company_city: companyCity,
+        company_desc: companyDescription,
         company_email: companyEmail,
-        company_instagram: instagram,
-        company_phone_number: phoneNumber,
-        company_linkedin: linkedIn,
-        company_image: req.file ? req.file.filename : '',
+        company_instagram: companyInstagram,
+        company_phone_number: companyPhoneNumber,
+        company_linkedin: companyLinkedIn,
+        company_image: req.file ? req.file.filename : isExist[0].company_image,
         company_updated_at: new Date(Date.now())
       }
+
+      if (req.file) {
+        console.log('ada file')
+        if (isExist[0].company_image.length > 0) {
+          console.log(`Delete Image${isExist[0].company_image}`)
+          const imgLoc = `src/uploads/${isExist[0].company_image}`
+          helper.deleteImage(imgLoc)
+        } else {
+          console.log('NO img in DB')
+        }
+      }
+
       if (isExist.length === 0) {
         return helper.response(res, 404, 'Id does not exist', null)
       } else {
-        const result = recruiterModel.updateRecruiter(setData, id)
+        const result = await recruiterModel.updateRecruiter(setData, id)
         return helper.response(res, 200, 'Data updated', result)
       }
     } catch (error) {
       console.log(error)
-      return helper.response(res, 400, 'Bad request', Error)
-    }
-  },
-  deleteRecruiter: async (req, res) => {
-    try {
-      const { id } = req.params
-      const isExist = await recruiterModel.getDataById(id)
-      if (isExist.length > 0) {
-        const result = await recruiterModel.deleteRecruiter(id)
-        return helper.response(res, 200, 'Data deleted', result)
-      } else {
-        return helper.response(res, 404, 'Data not found')
-      }
-    } catch (error) {
       return helper.response(res, 400, 'Bad request', Error)
     }
   },

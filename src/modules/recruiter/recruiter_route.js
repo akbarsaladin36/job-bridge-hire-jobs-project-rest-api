@@ -1,13 +1,15 @@
 const express = require('express')
 const Route = express.Router()
+const uploadFile = require('../../middleware/uploads')
+const redisMiddleware = require('../../middleware/redis')
 const recruiterController = require('./recruiter_controller')
 
-Route.get('/hello', (req, res) => {
-  res.send('Hello world')
-})
-Route.get('/:id', recruiterController.getDataById)
-Route.post('/', recruiterController.createRecruiter)
+Route.get(
+  '/:id',
+  redisMiddleware.getCompanyRedis,
+  recruiterController.getDataById
+)
+Route.patch('/:id', uploadFile, recruiterController.updateRecruiter)
 Route.post('/hire', recruiterController.hireWorker)
-Route.patch('/:id', recruiterController.updateRecruiter)
-Route.delete('/:id', recruiterController.deleteRecruiter)
+
 module.exports = Route
