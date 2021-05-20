@@ -37,6 +37,18 @@ module.exports = {
     })
   },
 
+  getWorkerByEmail: (email) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT * FROM worker WHERE email_worker = ?',
+        email,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
   getAttributeWorker: (attribute, id) => {
     return new Promise((resolve, reject) => {
       connection.query(

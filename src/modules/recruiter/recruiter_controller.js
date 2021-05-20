@@ -1,6 +1,7 @@
 const helper = require('./../../helpers/index')
 const recruiterModel = require('./recruiter_model')
 const nodemailer = require('nodemailer')
+const fs = require('fs')
 const bcrypt = require('bcrypt')
 require('dotenv').config()
 
@@ -16,47 +17,6 @@ module.exports = {
         return helper.response(res, 404, 'Not found', null)
       }
     } catch (error) {
-      return helper.response(res, 400, 'Bad request', Error)
-    }
-  },
-  createRecruiter: async (req, res) => {
-    try {
-      const {
-        representationName,
-        position,
-        email,
-        password,
-        companyName,
-        field,
-        city,
-        description,
-        companyEmail,
-        instagram,
-        phoneNumber,
-        linkedIn
-      } = req.body
-      const salt = bcrypt.genSaltSync(10)
-      const encryptedPassword = bcrypt.hashSync(password, salt)
-      const setData = {
-        is_verified: 0,
-        fullname_representation_company: representationName,
-        position_representation_company: position,
-        email_representation_company: email,
-        password_company: encryptedPassword,
-        company_name: companyName,
-        company_field: field,
-        company_city: city,
-        company_desc: description,
-        company_email: companyEmail,
-        company_instagram: instagram,
-        company_phone_number: phoneNumber,
-        company_linkedin: linkedIn,
-        company_image: req.file ? req.file.filename : ''
-      }
-      const result = await recruiterModel.createRecruiter(setData)
-      return helper.response(res, 200, 'Data created', result)
-    } catch (error) {
-      console.log(error)
       return helper.response(res, 400, 'Bad request', Error)
     }
   },
@@ -84,6 +44,14 @@ module.exports = {
         return helper.response(res, 404, 'Id does not exist', null)
       } else {
         const result = recruiterModel.updateRecruiter(setData, id)
+        const fileExist = fs.existsSync(`/src/uploads/${isExist[0].company_image}`)
+        if (fileExist) {
+          fs.unlink(`/src/uploads/${isExist[0].company_image}`, (error, result) => {
+            console.log(isExist[0].company_image)
+            if (error) throw error
+            console.log('unlink succeed')
+          })
+        }
         return helper.response(res, 200, 'Data updated', result)
       }
     } catch (error) {
@@ -97,6 +65,14 @@ module.exports = {
       const isExist = await recruiterModel.getDataById(id)
       if (isExist.length > 0) {
         const result = await recruiterModel.deleteRecruiter(id)
+        const fileExist = fs.existsSync(`/src/uploads/${isExist[0].company_image}`)
+        if (fileExist) {
+          fs.unlink(`/src/uploads/${isExist[0].company_image}`, (error, result) => {
+            console.log(isExist[0].company_image)
+            if (error) throw error
+            console.log('unlink succeed')
+          })
+        }
         return helper.response(res, 200, 'Data deleted', result)
       } else {
         return helper.response(res, 404, 'Data not found')
@@ -150,6 +126,8 @@ module.exports = {
   passChange: async (req, res) => {
     try {
       const { email, otp, newPassword } = req.body
+      const salt = bcrypt.genSaltSync(10)
+      const encryptedPassword = bcrypt.hashSync(newPassword, salt)
       const isExist = await recruiterModel.getDataByEmail(email)
       if (isExist.length === 0) {
         return helper.response(res, 404, 'Cannot update empty data', null)
@@ -162,13 +140,15 @@ module.exports = {
         } else {
           const id = isExist[0].id_company
           const setData = {
-            password_company: newPassword
+            password_company: encryptedPassword,
+            company_updated_at: new Date(Date.now())
           }
           const result = await recruiterModel.updateRecruiter(setData, id)
           return helper.response(res, 200, 'Password changed', result)
         }
       }
     } catch (error) {
+      console.log(error)
       return helper.response(res, 400, 'Bad request', Error)
     }
   }

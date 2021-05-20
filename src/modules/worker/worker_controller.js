@@ -2,6 +2,8 @@ const helper = require('../../helpers')
 const workerModel = require('./worker_model')
 const redis = require('redis')
 const client = redis.createClient()
+const nodemailer = require('nodemailer')
+const bcrypt = require('bcrypt')
 
 module.exports = {
   getWorker: async (req, res) => {
@@ -213,5 +215,86 @@ module.exports = {
       console.log(error)
       return helper.response(res, 400, 'Bad Request', error)
     }
+  },
+
+  passChangeRequest: async (req, res) => {
+    try {
+      const { email } = req.body
+      const isExist = await workerModel.getWorkerByEmail(email)
+
+      if (isExist.length === 0) {
+        console.log(email)
+        return helper.response(res, 404, 'Email not recognized', null)
+      } else {
+        const token = Math.ceil(Math.random() * 9001) + 998
+
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.email,
+            pass: process.env.emailPass
+          }
+        })
+
+        const mailOptions = {
+          from: process.env.email,
+          to: isExist[0].email_worker,
+          subject: 'Your forget password token',
+          html: `
+          <h1>Your reset password token</h1>
+          <p>Use '${token}' to reset your password.</p>
+          <p>Token will automatically expired in 5 minutes.</p>
+          `
+        }
+
+        transporter.sendMail(mailOptions, (err, info) => {
+          if (err) throw err
+          console.log('email sent: ' + info.response)
+        })
+
+        const id = isExist[0].id_worker
+        const setData = {
+          worker_updatetd_at: new Date(Date.now()),
+          reset_token: token
+        }
+
+        const result = await workerModel.updateWorker(setData, id)
+        return helper.response(res, 200, 'OTP sent', result)
+      }
+    } catch (error) {
+      return helper.response(res, 400, 'Bad request', Error)
+    }
+  },
+
+  changePassword: async (req, res) => {
+    try {
+      const { email, newPassword } = req.body
+      let { otp } = req.body
+      otp = +otp
+      const salt = bcrypt.genSaltSync(10)
+      const encryptedPassword = bcrypt.hashSync(newPassword, salt)
+      const isExist = await workerModel.getWorkerByEmail(email)
+
+      if (isExist.length === 0) {
+        return helper.response(res, 404, 'Email not recognized', null)
+      } else {
+        const isExpired = new Date(Date.now()) - isExist[0].worker_updatetd_at
+        if (otp !== isExist[0].reset_token || isExpired > 300000) {
+          console.log(isExist)
+          return helper.response(res, 300, 'Otp mismatch or has been expired', null)
+        } else {
+          const id = isExist[0].id_worker
+          const setData = {
+            password_worker: encryptedPassword,
+            worker_updatetd_at: new Date(Date.now())
+          }
+          const result = await workerModel.updateWorker(setData, id)
+          return helper.response(res, 200, 'Password changed', result)
+        }
+      }
+    } catch (error) {
+      return helper.response(res, 400, 'Bad request', Error)
+    }
   }
+
 }

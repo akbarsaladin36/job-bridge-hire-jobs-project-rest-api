@@ -10,10 +10,11 @@ Route.get('/hello', (req, res) => {
 Route.get('/:id',
   redisMiddleware.getRecruiterByIdRedis,
   recruiterController.getDataById)
-Route.post('/',
-  uploadFile,
-  recruiterController.createRecruiter)
+// Route.post('/',
+//   uploadFile,
+//   recruiterController.createRecruiter)
 Route.patch('/:id',
+  uploadFile,
   recruiterController.updateRecruiter)
 Route.delete('/:id',
   recruiterController.deleteRecruiter)
