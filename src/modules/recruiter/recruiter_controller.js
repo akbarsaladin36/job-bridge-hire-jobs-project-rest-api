@@ -6,7 +6,6 @@ const bcrypt = require('bcrypt')
 require('dotenv').config()
 
 module.exports = {
-
   getDataById: async (req, res) => {
     try {
       const { id } = req.params
@@ -26,7 +25,14 @@ module.exports = {
       const isExist = await recruiterModel.getDataById(id)
       // console.log(isExist[0].company_name)
       const {
-        companyName, field, city, description, companyEmail, instagram, phoneNumber, linkedIn
+        companyName,
+        field,
+        city,
+        description,
+        companyEmail,
+        instagram,
+        phoneNumber,
+        linkedIn
       } = req.body
       const setData = {
         company_name: companyName,
@@ -136,7 +142,12 @@ module.exports = {
         // console.log(isExpired)
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
           // console.log(req.body)
-          return helper.response(res, 300, 'Otp mismatch or token invalid', null)
+          return helper.response(
+            res,
+            300,
+            'Otp mismatch or token invalid',
+            null
+          )
         } else {
           const id = isExist[0].id_company
           const setData = {
@@ -152,5 +163,4 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   }
-
 }
