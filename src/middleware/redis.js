@@ -3,7 +3,6 @@ const client = redis.createClient()
 const helper = require('../helpers')
 
 module.exports = {
-<<<<<<< HEAD
   getRecruiterByIdRedis: (req, res, next) => {
     const { id } = req.params
     client.get(`getrecruiter:${id}`, (error, result) => {
@@ -18,10 +17,11 @@ module.exports = {
         console.log('Data tidak ada di dalam redis')
         next()
       }
-=======
+    })
+  },
+
   getWorkerRedis: (req, res, next) => {
     const { id } = req.params
-
     if (id) {
       client.get(`getworker:${id}`, (error, result) => {
         if (!error && result != null) {
@@ -66,7 +66,7 @@ module.exports = {
         })
       }
       next()
->>>>>>> 0c69e8d00043a35293507d4a6c0764e8884768fa
     })
   }
+
 }
