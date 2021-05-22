@@ -8,21 +8,19 @@ Route.get('/hello', (req, res) => {
   res.send('Hello world')
 })
 
-Route.get('/:id',
+Route.get(
+  '/:id',
   redisMiddleware.getRecruiterByIdRedis,
-  recruiterController.getRecruiterById)
+  recruiterController.getRecruiterById
+)
 
-Route.patch('/update/:id',
-  uploadFile,
-  recruiterController.updateRecruiter)
+Route.patch('/update/:id', uploadFile, recruiterController.updateRecruiter)
 
-Route.delete('/:id',
-  recruiterController.deleteRecruiter)
+Route.delete('/:id', recruiterController.deleteRecruiter)
 
-Route.patch('/request',
-  recruiterController.passChangeRequest)
+Route.patch('/request', recruiterController.passChangeRequest)
 
-Route.patch('/change-password',
-  recruiterController.changePassword)
+Route.patch('/change-password', recruiterController.changePassword)
+Route.post('/hire', recruiterController.hireWorker)
 
 module.exports = Route
