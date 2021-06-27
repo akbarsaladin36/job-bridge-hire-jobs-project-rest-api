@@ -22,7 +22,7 @@ module.exports = {
     return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
   },
 
-  sendMail: (msg, url, userEmailAddress) => {
+  sendMail: (msg, url, userEmailAddress, purpose, otp) => {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
@@ -37,7 +37,9 @@ module.exports = {
       from: `"Bridge Job" <${process.env.SMTP_EMAIL}>`, // sender address
       to: userEmailAddress, // list of receivers
       subject: `Bridge Job - ${msg}`, // Subject line
-      html: `<b>Click Here to activate</b><a href=${url}>Click !</>` // html body
+      html: purpose === 'verification'
+        ? `<b>Click Here to activate</b><a href=${url}>Click !</>`
+        : `<b>Use ${otp} to reset your password</b>`
     }
 
     transporter.sendMail(mailOptions, function (error, info) {

@@ -18,9 +18,6 @@ Route.patch('/update/:id', uploadFile, recruiterController.updateRecruiter)
 
 Route.delete('/:id', recruiterController.deleteRecruiter)
 
-Route.patch('/request', recruiterController.passChangeRequest)
-
-Route.patch('/change-password', recruiterController.changePassword)
 Route.post('/hire', recruiterController.hireWorker)
 
 module.exports = Route

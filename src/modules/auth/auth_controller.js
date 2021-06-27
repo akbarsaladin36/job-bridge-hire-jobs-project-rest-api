@@ -34,7 +34,7 @@ module.exports = {
         const result = await authModel.register('worker', setData)
         delete result.password_worker
         const url = `http://localhost:3001/api/v1/auth/verify-worker/${result.id}`
-        helper.sendMail('Please activate your account', url, emailWorker)
+        helper.sendMail('Please activate your account', url, emailWorker, 'verification', null)
         return helper.response(
           res,
           200,
@@ -89,11 +89,7 @@ module.exports = {
         const result = await authModel.register('company', setData)
         delete result.password_company
         const url = `http://localhost:3001/api/v1/auth/verify-company/${result.id}`
-        helper.sendMail(
-          'Please activate your account',
-          url,
-          emailRepresentationCompany
-        )
+        helper.sendMail('Please activate your account', url, emailRepresentationCompany, 'verification', null)
         return helper.response(
           res,
           200,
@@ -104,6 +100,7 @@ module.exports = {
         return helper.response(res, 400, 'Email has been registered')
       }
     } catch (error) {
+      console.log(error)
       return helper.response(res, 400, 'Bad Request', error)
     }
   },
@@ -214,5 +211,133 @@ module.exports = {
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
+  },
+
+  reqOtp: async (req, res) => {
+    try {
+      const { email } = req.body
+      const otp = Math.ceil(Math.random() * 9001) + 998
+      const isRecruiter = await authModel
+        .getDataCondition(
+          'company',
+          { email_representation_company: email }
+        )
+      const isWorker = await authModel
+        .getDataCondition(
+          'worker',
+          { email_worker: email }
+        )
+      if (isRecruiter.length > 0 || isWorker.length > 0) {
+        const worker = isWorker.length > 0
+        const id = worker
+          ? isWorker[0].id_worker
+          : isRecruiter[0].id_company
+        const setData = {
+          reset_token: otp
+        }
+
+        await helper.sendMail(
+          'Job Bridge OTP',
+          null,
+          email,
+          'Forget Password',
+          otp
+        )
+
+        if (worker) {
+          setData.worker_updated_at = new Date(Date.now())
+          const result = await authModel.changeData(
+            'worker',
+            setData,
+            id
+          )
+          return helper.response(res, 200, 'Otp sent to worker email', result)
+        } else {
+          setData.company_updated_at = new Date(Date.now())
+          const result = await authModel.changeData(
+            'company',
+            setData,
+            id
+          )
+          return helper.response(res, 200, 'Otp sent to company representative email', result)
+        }
+      } else {
+        return helper.response(res, 404, 'Email not registered')
+      }
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad request', error)
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const { email, otp, newPassword } = req.body
+      const isRecruiter = await authModel
+        .getDataCondition(
+          'company',
+          { email_representation_company: email }
+        )
+      const isWorker = await authModel
+        .getDataCondition(
+          'worker',
+          { email_worker: email }
+        )
+      if (isRecruiter.length > 0 || isWorker.length > 0) {
+        const worker = isWorker.length > 0
+        const data = worker
+          ? {
+              id: isWorker[0].id_worker,
+              token: isWorker[0].reset_token,
+              updatedAt: isWorker[0].worker_updated_at
+            }
+          : {
+              id: isRecruiter[0].id_company,
+              token: isRecruiter[0].reset_token,
+              updatedAt: isRecruiter[0].company_updated_at
+            }
+        const timeSpan = Math.floor((new Date(Date.now()) - data.updatedAt) / 60000)
+
+        if (data.token === +otp && timeSpan <= 5) {
+          const result = worker
+            ? await authModel.changeData(
+              'worker',
+              {
+                password_worker: bcrypt.hashSync(newPassword, 10),
+                worker_updated_at: new Date(Date.now())
+              },
+              data.id
+            )
+            : await authModel.changeData(
+              'company',
+              {
+                password_company: bcrypt.hashSync(newPassword, 10),
+                company_updated_at: new Date(Date.now())
+              },
+              data.id
+            )
+          delete result.password_worker
+          delete result.password_company
+
+          return helper.response(res, 200, 'Password changed', result)
+        } else {
+          return helper.response(res, 300, 'OTP Expired or mismatch')
+        }
+
+        // console.log(data)
+        // const id = worker
+        //   ? isWorker[0].worker_id
+        //   : isRecruiter[0].company_id
+        // let timeSpan = worker
+        //   ? isWorker[0].worker_updated_at
+        //   : isWorker[0].company_updated_at
+        // let token = wor
+      } else {
+        return helper.response(res, 404, 'Email not registered', null)
+      }
+    } catch (error) {
+      return helper.response(res, 400, 'Bad request', error)
+    }
   }
+
 }
