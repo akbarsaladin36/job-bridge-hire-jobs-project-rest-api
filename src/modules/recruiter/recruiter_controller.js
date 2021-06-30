@@ -1,6 +1,7 @@
 const helper = require('./../../helpers/index')
 const recruiterModel = require('./recruiter_model')
 const redis = require('redis')
+const bcrypt = require('bcrypt')
 const client = redis.createClient()
 require('dotenv').config()
 
@@ -103,6 +104,29 @@ module.exports = {
     } catch (error) {
       console.log(error)
       return helper.response(res, 400, 'Bad request', Error)
+    }
+  },
+
+  changePasswordRecruiter: async (req, res) => {
+    try {
+      const { id } = req.decodeToken.id_worker
+      const { newPassword, confirmNewPassword } = req.body
+
+      if (newPassword === confirmNewPassword) {
+        const salt = bcrypt.genSaltSync(10)
+        const hashed = bcrypt.hashSync(newPassword, salt)
+        const setData = {
+          password_recruiter: hashed,
+          recruiter_updated_at: new Date(Date.now())
+        }
+        const result = await recruiterModel.updateRecruiter(setData, id)
+        delete result.password_worker
+
+        return helper.response(res, 200, 'Password Changed', result)
+      } return helper.response(res, 300, 'Password Mismatch')
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
     }
   }
 }

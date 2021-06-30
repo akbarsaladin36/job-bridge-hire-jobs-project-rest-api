@@ -35,12 +35,21 @@ Route.post(
   redisMiddleware.clearDataWorkerRedis,
   workerController.postWorkerPortofolio
 )
+
 Route.post(
   '/experience/:id',
   authMiddleware.authentication,
   authMiddleware.isWorker,
   redisMiddleware.clearDataWorkerRedis,
   workerController.postWorkerExperience
+)
+
+Route.patch(
+  '/change-password',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  redisMiddleware.clearDataWorkerRedis,
+  workerController.changePasswordWorker
 )
 
 module.exports = Route
