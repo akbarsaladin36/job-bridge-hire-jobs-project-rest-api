@@ -1,7 +1,6 @@
 const connection = require('../../config/mysql')
 
 module.exports = {
-
   getDataById: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(
@@ -9,7 +8,8 @@ module.exports = {
         id,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
-        })
+        }
+      )
     })
   },
   getDataByEmail: (email) => {
@@ -19,7 +19,8 @@ module.exports = {
         email,
         (error, result) => {
           !error ? resolve(result) : reject(new Error(error))
-        })
+        }
+      )
     })
   },
   createRecruiter: (setData) => {
@@ -28,7 +29,9 @@ module.exports = {
         'INSERT INTO company SET ?',
         setData,
         (error, result) => {
-          !error ? resolve({ id_company: result.insertId, ...setData }) : reject(new Error(error))
+          !error
+            ? resolve({ id_company: result.insertId, ...setData })
+            : reject(new Error(error))
         }
       )
     })
@@ -39,7 +42,7 @@ module.exports = {
         'UPDATE company SET ? WHERE id_company = ?',
         [setData, id],
         (error, result) => {
-          !error ? resolve(result) : reject(new Error(error))
+          !error ? resolve({ id: id, ...setData }) : reject(new Error(error))
         }
       )
     })
@@ -55,5 +58,4 @@ module.exports = {
       )
     })
   }
-
 }

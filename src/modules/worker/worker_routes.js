@@ -27,16 +27,6 @@ Route.patch(
   workerController.updateWorkerSkills
 )
 
-Route.patch(
-  '/request',
-  workerController.passChangeRequest
-)
-
-Route.patch(
-  '/change-password',
-  workerController.changePassword
-)
-
 Route.post(
   '/portofolio/:id',
   authMiddleware.authentication,

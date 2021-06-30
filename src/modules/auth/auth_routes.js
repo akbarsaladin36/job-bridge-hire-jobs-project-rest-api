@@ -10,4 +10,7 @@ Route.post('/register-company', authController.registerCompany)
 Route.post('/login-company', authController.loginCompany)
 Route.get('/verify-company/:id', authController.verifyCompany)
 
+Route.patch('/request-otp', authController.reqOtp)
+Route.patch('/reset-password', authController.resetPassword)
+
 module.exports = Route

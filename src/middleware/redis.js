@@ -67,6 +67,36 @@ module.exports = {
       }
       next()
     })
+  },
+
+  getCompanyRedis: (req, res, next) => {
+    const { id } = req.params
+    client.get(`getcompany:${id}`, (error, result) => {
+      if (!error && result != null) {
+        console.log('data ada di dalam redis')
+        return helper.response(
+          res,
+          200,
+          `Succes Get company by Id ${id} (Redis)`,
+          JSON.parse(result)
+        )
+      } else {
+        console.log('data tidak ada dalam redis')
+        next()
+      }
+    })
+  },
+
+  clearDataCompanyRedis: (req, res, next) => {
+    client.keys('getcompany*', (_error, result) => {
+      console.log('isi key dalam redis', result)
+      if (result.length > 0) {
+        result.forEach((item) => {
+          client.del(item)
+        })
+      }
+      next()
+    })
   }
 
 }

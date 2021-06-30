@@ -22,7 +22,7 @@ module.exports = {
     return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`)
   },
 
-  sendMail: (msg, url, userEmailAddress) => {
+  sendMail: (msg, url, userEmailAddress, purpose, otp) => {
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
       port: 587,
@@ -34,10 +34,39 @@ module.exports = {
     })
 
     const mailOptions = {
-      from: `"tiketinAja 👻" <${process.env.SMTP_EMAIL}>`, // sender address
+      from: `"Bridge Job" <${process.env.SMTP_EMAIL}>`, // sender address
       to: userEmailAddress, // list of receivers
-      subject: `tiketinAja - ${msg}`, // Subject line
-      html: `<b>Click Here to activate</b><a href=${url}>Click !</>` // html body
+      subject: `Bridge Job - ${msg}`, // Subject line
+      html: purpose === 'verification'
+        ? `<b>Click Here to activate</b><a href=${url}>Click !</>`
+        : `<b>Use ${otp} to reset your password</b>`
+    }
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error)
+      } else {
+        console.log('Email sent: ' + info.response)
+      }
+    })
+  },
+
+  hireViaEmail: (title, from, body, EmailAddress) => {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD
+      }
+    })
+
+    const mailOptions = {
+      from: `"Bridge Job" <${process.env.SMTP_EMAIL}>`, // sender address
+      to: EmailAddress, // list of receivers
+      subject: `Bridge Job - FROM : ${from} - ${title}`, // Subject line
+      html: `<p>${body}</p>` // html body
     }
 
     transporter.sendMail(mailOptions, function (error, info) {
