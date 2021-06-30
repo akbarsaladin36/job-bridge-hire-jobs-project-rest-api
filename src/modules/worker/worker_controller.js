@@ -280,7 +280,12 @@ module.exports = {
         const isExpired = new Date(Date.now()) - isExist[0].worker_updated_at
         if (otp !== isExist[0].reset_token || isExpired > 300000) {
           console.log(isExist)
-          return helper.response(res, 300, 'Otp mismatch or has been expired', null)
+          return helper.response(
+            res,
+            300,
+            'Otp mismatch or has been expired',
+            null
+          )
         } else {
           const id = isExist[0].id_worker
           const setData = {
@@ -295,5 +300,4 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', Error)
     }
   }
-
 }

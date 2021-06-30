@@ -74,6 +74,7 @@ module.exports = {
   },
 
   updateWorker: (setData, id) => {
+    console.log(setData)
     return new Promise((resolve, reject) => {
       connection.query(
         'UPDATE worker SET ? WHERE id_worker = ?',
