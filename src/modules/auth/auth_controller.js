@@ -298,7 +298,7 @@ module.exports = {
             }
         const timeSpan = Math.floor((new Date(Date.now()) - data.updatedAt) / 60000)
 
-        if (data.token === +otp && timeSpan <= 5) {
+        if (+data.token === +otp && timeSpan <= 5) {
           const result = worker
             ? await authModel.changeData(
               'worker',
@@ -321,7 +321,16 @@ module.exports = {
 
           return helper.response(res, 200, 'Password changed', result)
         } else {
-          return helper.response(res, 300, 'OTP Expired or mismatch')
+          const timeSpan = Math.floor((new Date(Date.now()) - data.updatedAt) / 60000)
+          const setData = {
+            email: email,
+            token: data.token,
+            otp: otp,
+            newPassword: newPassword,
+            timeSpan: timeSpan,
+            data: data
+          }
+          return helper.response(res, 300, 'OTP Expired or mismatch', setData)
         }
 
         // console.log(data)
