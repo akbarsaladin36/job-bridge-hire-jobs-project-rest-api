@@ -21,7 +21,8 @@ Route.delete('/:id', recruiterController.deleteRecruiter)
 
 Route.post('/hire', recruiterController.hireWorker)
 
-Route.patch('/change-password',
+Route.patch(
+  '/change-password',
   authMiddleware.isCompany,
   redisMiddleware.clearDataWorkerRedis,
   recruiterController.changePasswordRecruiter
