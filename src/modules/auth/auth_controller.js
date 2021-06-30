@@ -34,7 +34,13 @@ module.exports = {
         const result = await authModel.register('worker', setData)
         delete result.password_worker
         const url = `http://localhost:3001/api/v1/auth/verify-worker/${result.id}`
-        helper.sendMail('Please activate your account', url, emailWorker, 'verification', null)
+        helper.sendMail(
+          'Please activate your account',
+          url,
+          emailWorker,
+          'verification',
+          null
+        )
         return helper.response(
           res,
           200,
@@ -89,7 +95,13 @@ module.exports = {
         const result = await authModel.register('company', setData)
         delete result.password_company
         const url = `http://localhost:3001/api/v1/auth/verify-company/${result.id}`
-        helper.sendMail('Please activate your account', url, emailRepresentationCompany, 'verification', null)
+        helper.sendMail(
+          'Please activate your account',
+          url,
+          emailRepresentationCompany,
+          'verification',
+          null
+        )
         return helper.response(
           res,
           200,
@@ -109,12 +121,18 @@ module.exports = {
     try {
       // console.log(req.params)
       const { id } = req.params
-      const result = await authModel.changeData(
+      let result = await authModel.changeData(
         'worker',
         { is_verified: '1' },
         id
       )
-      return helper.response(res, 200, 'Succes Activate your Account !', result)
+      result = await authModel.getDataCondition('worker', {
+        id_worker: id
+      })
+      return res.render('index.ejs', {
+        data: result,
+        email: result[0].worker_email
+      })
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
@@ -124,12 +142,18 @@ module.exports = {
     try {
       // console.log(req.params)
       const { id } = req.params
-      const result = await authModel.changeData(
+      let result = await authModel.changeData(
         'company',
         { is_verified: '1' },
         id
       )
-      return helper.response(res, 200, 'Succes Activate your Account !', result)
+      result = await authModel.getDataCondition('company', {
+        id_company: id
+      })
+      return res.render('index.ejs', {
+        data: result,
+        email: result[0].company_email
+      })
     } catch (error) {
       return helper.response(res, 400, 'Bad Request', error)
     }
@@ -217,21 +241,15 @@ module.exports = {
     try {
       const { email } = req.body
       const otp = Math.ceil(Math.random() * 9001) + 998
-      const isRecruiter = await authModel
-        .getDataCondition(
-          'company',
-          { email_representation_company: email }
-        )
-      const isWorker = await authModel
-        .getDataCondition(
-          'worker',
-          { email_worker: email }
-        )
+      const isRecruiter = await authModel.getDataCondition('company', {
+        email_representation_company: email
+      })
+      const isWorker = await authModel.getDataCondition('worker', {
+        email_worker: email
+      })
       if (isRecruiter.length > 0 || isWorker.length > 0) {
         const worker = isWorker.length > 0
-        const id = worker
-          ? isWorker[0].id_worker
-          : isRecruiter[0].id_company
+        const id = worker ? isWorker[0].id_worker : isRecruiter[0].id_company
         const setData = {
           reset_token: otp
         }
@@ -246,20 +264,17 @@ module.exports = {
 
         if (worker) {
           setData.worker_updated_at = new Date(Date.now())
-          const result = await authModel.changeData(
-            'worker',
-            setData,
-            id
-          )
+          const result = await authModel.changeData('worker', setData, id)
           return helper.response(res, 200, 'Otp sent to worker email', result)
         } else {
           setData.company_updated_at = new Date(Date.now())
-          const result = await authModel.changeData(
-            'company',
-            setData,
-            id
+          const result = await authModel.changeData('company', setData, id)
+          return helper.response(
+            res,
+            200,
+            'Otp sent to company representative email',
+            result
           )
-          return helper.response(res, 200, 'Otp sent to company representative email', result)
         }
       } else {
         return helper.response(res, 404, 'Email not registered')
@@ -273,16 +288,12 @@ module.exports = {
   resetPassword: async (req, res) => {
     try {
       const { email, otp, newPassword } = req.body
-      const isRecruiter = await authModel
-        .getDataCondition(
-          'company',
-          { email_representation_company: email }
-        )
-      const isWorker = await authModel
-        .getDataCondition(
-          'worker',
-          { email_worker: email }
-        )
+      const isRecruiter = await authModel.getDataCondition('company', {
+        email_representation_company: email
+      })
+      const isWorker = await authModel.getDataCondition('worker', {
+        email_worker: email
+      })
       if (isRecruiter.length > 0 || isWorker.length > 0) {
         const worker = isWorker.length > 0
         const data = worker
@@ -296,32 +307,36 @@ module.exports = {
               token: isRecruiter[0].reset_token,
               updatedAt: isRecruiter[0].company_updated_at
             }
-        const timeSpan = Math.floor((new Date(Date.now()) - data.updatedAt) / 60000)
+        const timeSpan = Math.floor(
+          (new Date(Date.now()) - data.updatedAt) / 60000
+        )
 
         if (+data.token === +otp && timeSpan <= 5) {
           const result = worker
             ? await authModel.changeData(
-              'worker',
-              {
-                password_worker: bcrypt.hashSync(newPassword, 10),
-                worker_updated_at: new Date(Date.now())
-              },
-              data.id
-            )
+                'worker',
+                {
+                  password_worker: bcrypt.hashSync(newPassword, 10),
+                  worker_updated_at: new Date(Date.now())
+                },
+                data.id
+              )
             : await authModel.changeData(
-              'company',
-              {
-                password_company: bcrypt.hashSync(newPassword, 10),
-                company_updated_at: new Date(Date.now())
-              },
-              data.id
-            )
+                'company',
+                {
+                  password_company: bcrypt.hashSync(newPassword, 10),
+                  company_updated_at: new Date(Date.now())
+                },
+                data.id
+              )
           delete result.password_worker
           delete result.password_company
 
           return helper.response(res, 200, 'Password changed', result)
         } else {
-          const timeSpan = Math.floor((new Date(Date.now()) - data.updatedAt) / 60000)
+          const timeSpan = Math.floor(
+            (new Date(Date.now()) - data.updatedAt) / 60000
+          )
           const setData = {
             email: email,
             token: data.token,
@@ -348,5 +363,4 @@ module.exports = {
       return helper.response(res, 400, 'Bad request', error)
     }
   }
-
 }
