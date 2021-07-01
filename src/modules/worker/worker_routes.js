@@ -52,4 +52,18 @@ Route.patch(
   workerController.changePasswordWorker
 )
 
+Route.delete(
+  '/experience/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.deleteExperience
+)
+
+Route.patch(
+  '/update-experience/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.updateExperience
+)
+
 module.exports = Route

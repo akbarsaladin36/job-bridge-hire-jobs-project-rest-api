@@ -237,5 +237,46 @@ module.exports = {
       console.log(error)
       return helper.response(res, 400, 'Bad Request', error)
     }
+  },
+
+  deleteExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const result = await workerModel.deleteExperience(id)
+
+      return helper.response(res, 200, 'Success delete experience', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad request')
+    }
+  },
+
+  updateExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+      const {
+        position,
+        companyName,
+        dateIn,
+        dateOut,
+        jobDesc
+      } = req.body
+
+      const setData = {
+        position_experience: position,
+        company_name_experience: companyName,
+        work_date_in_experience: dateIn,
+        work_date_out_experience: dateOut,
+        job_desc_experience: jobDesc,
+        experience_updated_at: new Date(Date.now())
+      }
+
+      const result = await workerModel.updateExperience(setData, id)
+
+      return helper.response(res, 200, 'Experience Deleted', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad request')
+    }
   }
 }
