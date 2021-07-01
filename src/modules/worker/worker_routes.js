@@ -35,7 +35,21 @@ Route.post(
   redisMiddleware.clearDataWorkerRedis,
   workerController.postWorkerPortofolio
 )
-
+Route.patch(
+  '/portofolio/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  uploadFile,
+  redisMiddleware.clearDataWorkerRedis,
+  workerController.updateWorkerPortofolio
+)
+Route.delete(
+  '/portofolio/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  redisMiddleware.clearDataWorkerRedis,
+  workerController.deleteWorkerPortofolio
+)
 Route.post(
   '/experience/:id',
   authMiddleware.authentication,
@@ -43,7 +57,20 @@ Route.post(
   redisMiddleware.clearDataWorkerRedis,
   workerController.postWorkerExperience
 )
-
+Route.patch(
+  '/experience/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  redisMiddleware.clearDataWorkerRedis,
+  workerController.updateWorkerExperience
+)
+Route.delete(
+  '/experience/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  redisMiddleware.clearDataWorkerRedis,
+  workerController.deleteWorkerExperience
+)
 Route.patch(
   '/change-password',
   authMiddleware.authentication,

@@ -186,6 +186,38 @@ module.exports = {
     }
   },
 
+  updateWorkerExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+      const setData = {}
+      for (const [key, value] of Object.entries(req.body)) {
+        setData[helper.convertToSnakeCase(key)] = value
+      }
+      // console.log(setData)
+
+      const result = await workerModel.updateAttributeWorker(
+        'experience',
+        setData,
+        id
+      )
+      return helper.response(res, 200, 'Succes update data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
+  deleteWorkerExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.deleteAttributeWorker('experience', id)
+      return helper.response(res, 200, 'Succes delete data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
   postWorkerPortofolio: async (req, res) => {
     try {
       const { id } = req.params
@@ -216,6 +248,39 @@ module.exports = {
     }
   },
 
+  updateWorkerPortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const setData = {}
+      for (const [key, value] of Object.entries(req.body)) {
+        setData[helper.convertToSnakeCase(key)] = value
+      }
+      setData.image_portofolio = req.file ? req.file.filename : ''
+      console.log(setData)
+
+      const result = await workerModel.updateAttributeWorker(
+        'portofolio',
+        setData,
+        id
+      )
+      return helper.response(res, 200, 'Succes update data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
+  deleteWorkerPortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.deleteAttributeWorker('portofolio', id)
+      return helper.response(res, 200, 'Succes delete data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
   changePasswordWorker: async (req, res) => {
     try {
       const { id } = req.decodeToken.id_worker
@@ -232,7 +297,8 @@ module.exports = {
         delete result.password_worker
 
         return helper.response(res, 200, 'Password Changed', result)
-      } return helper.response(res, 300, 'Password Mismatch')
+      }
+      return helper.response(res, 300, 'Password Mismatch')
     } catch (error) {
       console.log(error)
       return helper.response(res, 400, 'Bad Request', error)

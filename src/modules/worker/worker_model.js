@@ -73,6 +73,30 @@ module.exports = {
     })
   },
 
+  updateAttributeWorker: (attribute, setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `UPDATE ${attribute} SET ? WHERE id_${attribute} = ?`,
+        [setData, id],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  deleteAttributeWorker: (attribute, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `DELETE FROM ${attribute} WHERE id_${attribute} = ?`,
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
   updateWorker: (setData, id) => {
     console.log(setData)
     return new Promise((resolve, reject) => {
