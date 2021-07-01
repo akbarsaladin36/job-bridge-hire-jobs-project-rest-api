@@ -344,5 +344,47 @@ module.exports = {
     } catch (error) {
       return helper.response(res, 400, 'Bad request')
     }
+  },
+
+  updatePortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const {
+        appName,
+        appDesc,
+        linkPublic,
+        linkRepo,
+        companyName,
+        typePortofolio
+      } = req.body
+
+      const setData = {
+        app_name_portofolio: appName,
+        app_desc_portofolio: appDesc,
+        link_public_portofolio: linkPublic,
+        link_repository_portofolio: linkRepo,
+        company_name_portofolio: companyName,
+        type_portofolio: typePortofolio,
+        portofolio_updated_at: new Date(Date.now())
+      }
+
+      const result = await workerModel.updatePortofolio(setData, id)
+
+      return helper.response(res, 200, 'Portofolio Updated', result)
+    } catch (err) {
+      return helper.response(res, 400, 'Bad request', err)
+    }
+  },
+
+  deletePortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.deletePortofolio(id)
+
+      return helper.response(res, 200, 'Portofolio deleted', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad request', error)
+    }
   }
 }

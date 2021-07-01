@@ -93,4 +93,18 @@ Route.patch(
   workerController.updateExperience
 )
 
+Route.patch(
+  '/update-portofolio/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.updatePortofolio
+)
+
+Route.delete(
+  '/delete-portofolio/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.deletePortofolio
+)
+
 module.exports = Route

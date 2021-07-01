@@ -175,6 +175,30 @@ module.exports = {
         }
       )
     })
+  },
+
+  updatePortofolio: (setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'UPDATE portofolio set ? WHERE id_portofolio = ?',
+        [setData, id],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  deletePortofolio: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'DELETE FROM portofolio WHERE id_portofolio = ?',
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
   }
 
 }
