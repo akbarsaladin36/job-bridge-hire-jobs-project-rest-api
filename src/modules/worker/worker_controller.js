@@ -325,5 +325,89 @@ module.exports = {
       console.log(error)
       return helper.response(res, 400, 'Bad Request', error)
     }
+  },
+
+  deleteExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+
+      const result = await workerModel.deleteExperience(id)
+
+      return helper.response(res, 200, 'Success delete experience', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad request')
+    }
+  },
+
+  updateExperience: async (req, res) => {
+    try {
+      const { id } = req.params
+      const {
+        position,
+        companyName,
+        dateIn,
+        dateOut,
+        jobDesc
+      } = req.body
+
+      const setData = {
+        position_experience: position,
+        company_name_experience: companyName,
+        work_date_in_experience: dateIn,
+        work_date_out_experience: dateOut,
+        job_desc_experience: jobDesc,
+        experience_updated_at: new Date(Date.now())
+      }
+
+      const result = await workerModel.updateExperience(setData, id)
+
+      return helper.response(res, 200, 'Experience Deleted', result)
+    } catch (error) {
+      return helper.response(res, 400, 'Bad request')
+    }
+  },
+
+  updatePortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const {
+        appName,
+        appDesc,
+        linkPublic,
+        linkRepo,
+        companyName,
+        typePortofolio
+      } = req.body
+
+      const setData = {
+        app_name_portofolio: appName,
+        app_desc_portofolio: appDesc,
+        link_public_portofolio: linkPublic,
+        link_repository_portofolio: linkRepo,
+        company_name_portofolio: companyName,
+        type_portofolio: typePortofolio,
+        potofolio_updated_at: new Date(Date.now())
+      }
+
+      const result = await workerModel.updatePortofolio(setData, id)
+
+      return helper.response(res, 200, 'Portofolio Updated', result)
+    } catch (err) {
+      console.log(err)
+      return helper.response(res, 400, 'Bad request', err)
+    }
+  },
+
+  deletePortofolio: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.deletePortofolio(id)
+
+      return helper.response(res, 200, 'Portofolio deleted', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad request', error)
+    }
   }
 }

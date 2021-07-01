@@ -140,5 +140,77 @@ module.exports = {
         }
       )
     })
+  },
+
+  getWorkerSkill: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT * FROM skill WHERE id_worker = ?',
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  getWorkerExperience: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query('SELECT * FROM experience WHERE id_worker = ?',
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  updateExperience: (setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'UPDATE experience SET ? WHERE id_experience = ?',
+        [setData, id],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  deleteExperience: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'DELETE FROM experience WHERE id_experience = ?',
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  updatePortofolio: (setData, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'UPDATE portofolio set ? WHERE id_portofolio = ?',
+        [setData, id],
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
+  deletePortofolio: (id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        'DELETE FROM portofolio WHERE id_portofolio = ?',
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
   }
+
 }
