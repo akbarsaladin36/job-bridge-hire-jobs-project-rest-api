@@ -61,6 +61,18 @@ module.exports = {
     })
   },
 
+  getOneAttributeworker: (attribute, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT * FROM ${attribute} WHERE id_${attribute} = ?`,
+        id,
+        (error, result) => {
+          !error ? resolve(result) : reject(new Error(error))
+        }
+      )
+    })
+  },
+
   addAttributeWorker: (attribute, setData) => {
     return new Promise((resolve, reject) => {
       connection.query(

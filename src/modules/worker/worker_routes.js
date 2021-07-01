@@ -26,7 +26,12 @@ Route.patch(
   redisMiddleware.clearDataWorkerRedis,
   workerController.updateWorkerSkills
 )
-
+Route.get(
+  '/portofolio/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.getWorkerPortofolioById
+)
 Route.post(
   '/portofolio/:id',
   authMiddleware.authentication,
@@ -49,6 +54,12 @@ Route.delete(
   authMiddleware.isWorker,
   redisMiddleware.clearDataWorkerRedis,
   workerController.deleteWorkerPortofolio
+)
+Route.get(
+  '/experience/:id',
+  authMiddleware.authentication,
+  authMiddleware.isWorker,
+  workerController.getWorkerExperienceById
 )
 Route.post(
   '/experience/:id',

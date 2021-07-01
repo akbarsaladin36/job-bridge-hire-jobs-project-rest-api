@@ -186,6 +186,17 @@ module.exports = {
     }
   },
 
+  getWorkerExperienceById: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.getOneAttributeworker('experience', id)
+      return helper.response(res, 200, 'Succes get data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
   updateWorkerExperience: async (req, res) => {
     try {
       const { id } = req.params
@@ -242,6 +253,17 @@ module.exports = {
 
       const result = await workerModel.addAttributeWorker('portofolio', setData)
       return helper.response(res, 200, 'Succes create data !', result)
+    } catch (error) {
+      console.log(error)
+      return helper.response(res, 400, 'Bad Request', error)
+    }
+  },
+
+  getWorkerPortofolioById: async (req, res) => {
+    try {
+      const { id } = req.params
+      const result = await workerModel.getOneAttributeworker('portofolio', id)
+      return helper.response(res, 200, 'Succes get data !', result)
     } catch (error) {
       console.log(error)
       return helper.response(res, 400, 'Bad Request', error)
