@@ -365,13 +365,14 @@ module.exports = {
         link_repository_portofolio: linkRepo,
         company_name_portofolio: companyName,
         type_portofolio: typePortofolio,
-        portofolio_updated_at: new Date(Date.now())
+        potofolio_updated_at: new Date(Date.now())
       }
 
       const result = await workerModel.updatePortofolio(setData, id)
 
       return helper.response(res, 200, 'Portofolio Updated', result)
     } catch (err) {
+      console.log(err)
       return helper.response(res, 400, 'Bad request', err)
     }
   },
