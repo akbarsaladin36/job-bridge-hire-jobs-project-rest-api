@@ -29,7 +29,7 @@ The app is dynamically built and designed to seek, recruit, and promote talents 
 
 ## Getting Started
 
-1. Download this Project or you can type `git clone https://github.com/arsasf/coffee-mate-backend.git`
+1. Download this Project or you can type `git clone https://github.com/akbarsaladin36/job-bridge-hire-jobs-project-rest-api.git`
 2. Open app's directory in CMD or Terminal
 3. Type `npm install` or `yarn install`
 4. Add .env file at root folder project
