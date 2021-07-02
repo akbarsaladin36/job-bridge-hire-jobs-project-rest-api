@@ -279,7 +279,6 @@ module.exports = {
       }
       setData.image_portofolio = req.file ? req.file.filename : ''
       console.log(setData)
-
       const result = await workerModel.updateAttributeWorker(
         'portofolio',
         setData,
@@ -343,13 +342,7 @@ module.exports = {
   updateExperience: async (req, res) => {
     try {
       const { id } = req.params
-      const {
-        position,
-        companyName,
-        dateIn,
-        dateOut,
-        jobDesc
-      } = req.body
+      const { position, companyName, dateIn, dateOut, jobDesc } = req.body
 
       const setData = {
         position_experience: position,
