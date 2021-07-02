@@ -1,7 +1,5 @@
 <h1 align='center'>Rest API - Job Bridge</h1>
   <p align="center">
-    <a href="link_deploy">View Demo</a>
-    ·
     <a href="https://github.com/akbarsaladin36/job-bridge-hire-jobs-project-rest-api/issues/new">Report Bug</a>
     ·
     <a href="https://github.com/akbarsaladin36/job-bridge-hire-jobs-project-rest-api/issues/new">Request Feature</a>
@@ -27,7 +25,7 @@ The app is dynamically built and designed to seek, recruit, and promote talents 
 
 1. <a href="https://nodejs.org/en/download/">Node JS LTS Version (recommended)</a>
 2. Node_modules `npm install` or `yarn install`
-3. Postman Documentation [`here`](https://documenter.getpostman.com/view/14947284/TzeZD5sE)
+3. Postman Documentation [`here`](https://documenter.getpostman.com/view/14948086/Tzkzoxxf)
 
 ## Getting Started
 
